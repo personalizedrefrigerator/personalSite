@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <meta charset="utf-8"/>
+    <title>LinTop</title>
+
+    <style>
+.content
+{
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 500px;
+
+    box-shadow: inset 5px 0 10px rgba(0, 0, 0, 0.34);
+    
+    padding: 10px;
+
+    background-color: white;
+    color: black;
+}
+
+.header
+{
+    position: sticky;
+    background-color: black;
+    color: white;
+    font: bold 4em Ani, Chilanka, cursive, sans;
+}
+
+@media print
+{
+    .content
+    {
+        max-width: auto;
+        box-shadow: none;
+        padding: 0px;
+        background-color: auto;
+        color: auto;
+    }
+
+    .header
+    {
+        display: none;
+    }
+}
+    </style>
+    </head>
+    <body>
+        <header>
+            LinTop
+        </header>
+        <div class="content">
+            <p>
+                This project and website were created because their author
+            felt obligated to do so as a part of the registration process
+            for a GitHub OAuth application.
+            </p>
+
+            <p>
+            This application was created as a part of a <a href = "https://codelabs.developers.google.com/codelabs/flutter-github-graphql-client/index.html#3">Google CodeLab, Write a Flutter Desktop Application</a>.
+            </p>
+        </div>
+    </body>
+</html>
