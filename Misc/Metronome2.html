@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta name = "viewport" content = "width=device-width,initial-scale=1.0,user-scalable=yes,min-scale=1.0,max-scale=2.0"/>
+    <meta http-equiv="Cache-Control" content="public"/>
+    <meta http-equiv="Pragma" content="cache"/>
+    
+    <title>WebTimeMeterApp</title>
+    
+    <style>
+    @keyframes fadeIn
+    {
+        0% { filter: opacity(0%); }
+        100% { filter: opacity(100%); }
+    }
+    
+    @keyframes shrinkOut
+    {
+        0% { height: 12em; }
+        50% { height: 6em; }
+        100% { height: 0em; }
+    }
+    
+    input, select
+    {
+        box-shadow: 3px 5px 3px rgba(0, 0, 0, 0.4);
+        
+        border-radius: 4px;
+        background-image: linear-gradient(2deg, #aaaaaa, #eeffff);
+        background-size: 100% 100%;
+        
+        border: 1px solid gray;
+    }
+    
+    #metronomeControlsArea
+    {
+        width: 100%;
+        
+        display: flex;
+        flex-direction: row;
+        
+        overflow-x: auto;
+        overflow-y: hidden;
+        
+        font: 1em Serif;
+        
+        justify-content: left;
+    }
+    
+    .metronomeControlContainer
+    {
+        box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.4), inset 2px 4px 4px rgba(0, 0, 0, 0.2);
+        margin-bottom: 4px;
+        
+        padding: 5px;
+        
+        border-bottom-left-radius: 4px;
+        
+        overflow-y: hidden;
+        overflow-x: hidden;
+        
+        filter: opacity(100%);
+        animation: fadeIn 0.5s;
+        
+        min-width: 200px;
+        
+        transition: 0.5s ease filter;
+        
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .version
+    {
+        font: 7px Serif;
+    }
+    
+    .startButton
+    {
+        margin-left: auto;
+        margin-right: auto;
+        
+        display: block;
+        
+        background-color: green;
+        
+        font: 12pt Serif;
+        color: black;
+        
+        filter: opacity(100%);
+        animation: fadeIn 0.5s;
+    }
+    
+    button
+    {
+        box-shadow: 3px 5px 3px rgba(0, 0, 0, 0.4);
+        text-shadow: 2px 2px 1px rgba(255, 255, 255, 0.6);
+        
+        color: #222222;
+        
+        transform: matrix(1, 0, 0, 1, 0, 0);
+        
+        background-image: radial-gradient(rgba(255, 255, 255, 0.6), rgba(0, 255, 255, 0.4));
+        background-size: 5px 5px;
+        
+        border: 1px solid gray;
+        border-radius: 10px;
+        
+        padding: 5px;
+        
+        transition: 0.4s ease transform, filter, box-shadow;
+    }
+    
+    button:hover
+    {
+        transform: matrix(1, 0.1, -0.01, 0.9, 0, 0);
+        box-shadow: 6px 6px 4px rgba(0, 0, 0, 0.4);
+    }
+    </style>
+</head>
+<body>
+    <div id='metronomeControlsArea'></div>
+    <center class = "version">v. 1.26</center>
+    <script>
+        function MetronomeInsturment(audioCtx)
+        {
+            this.audioContext = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+            this.oscillator = this.audioContext.createOscillator();
+            this.oscillator.frequency.value = 880;
+            this.oscillator.type = "square";
+            this.gain = this.audioContext.createGain();
+            this.gain.gain.value = 0;
+            this.oscillator.connect(this.gain);
+            this.secondaryGain = this.audioContext.createGain();
+            this.gain.connect(this.secondaryGain);
+            this.secondaryGain.connect(this.audioContext.destination);
+            this.secondaryGain.gain.value = 1;
+            this.oscillator.start();
+            
+            this.mustThinkAhead = 0;
+            
+            this.fadeGain = false;
+            
+            var me = this;
+            
+            // Set the insturment's volume.
+            this.setVolume = function(value, timeToPlay)
+            {
+                me.secondaryGain.gain.setValueAtTime(value, timeToPlay || me.audioContext.currentTime);
+            };
+            
+            this.getVolume = function()
+            {
+                return me.secondaryGain.gain.value;
+            };
+            
+            this.play = function (duration, playAtTime)
+            {
+                playAtTime = playAtTime !== undefined ? playAtTime : me.audioContext.currentTime;
+                
+                me.gain.gain.setValueAtTime(1, playAtTime);
+                
+                var rampFunction;
+                
+                if (this.fadeGain)
+                {
+                    rampFunction = function(value, time) { me.gain.gain.linearRampToValueAtTime(value, time); };
+                }
+                else
+                {
+                    rampFunction = function(value, time) { me.gain.gain.setValueAtTime(value, time); };
+                }
+                
+                rampFunction(0, (playAtTime) + duration / 1000);
+            };
+            
+            this.cancelScheduledNotes = function()
+            {
+                me.gain.gain.cancelScheduledValues(me.audioContext.currentTime);
+            };
+            
+            // Stop the insturment.
+            this.stop = function ()
+            {
+                // Set the gain to zero.
+                me.gain.gain.value = 0;
+                
+                // Stop the oscillator.
+                me.oscillator.stop(me.audioContext.currentTime + 0.1); // Stop in 0.1 seconds.
+                
+                window.osc = me.oscillator;
+            };
+        }
+        
+        function Metronome(element, audioCtx)
+        {
+            this.parentElement = element || document.getElementById("metronomeControlsArea");
+            
+            this.element = document.createElement("div");
+            this.element.setAttribute("class", "metronomeControlContainer");
+            this.parentElement.appendChild(this.element);
+            
+            this.audioContext = audioCtx || (new (window.AudioContext || window.webkitAudioContext)());
+            this.insturment = new MetronomeInsturment(this.audioContext);
+            this.insturment2 = new MetronomeInsturment(this.audioContext);
+            this.bpm = 60;
+            this.playTime = 100;
+            this.changePitch=0;
+            this.beat=0;
+            this.timeOffset = 0.2 * 1000; // Convert 0.2s to ms.
+            this.mustUpdateScheduled = false;
+            
+            var shouldStopPlaying = false;
+            var lastBeatsScheduled = 0;
+            
+            var me = this;
+            
+            this.setBPM = function (bpm)
+            {
+                this.bpm = bpm;
+                this.tempoInput.value = this.bpm;
+                this.tempoSlider.value = this.bpm;
+            };
+            
+            var lastTime = this.audioContext.currentTime * 1000;//new Date().getTime();
+            var trueLastTime = lastTime;
+            var lastProperDeltaT = 0;
+            
+            this.noteUpdate = function()
+            {
+                me.mustUpdateScheduled = true;
+            };
+            
+            this.play = function ()
+            {
+                var nowTime = me.audioContext.currentTime * 1000;//new Date().getTime();
+                
+                var properDeltaT = 1000/(this.bpm/(60));
+                var maxBeats = Math.floor(this.bpm / 4.0);
+                
+                if (properDeltaT != lastProperDeltaT || me.mustUpdateScheduled)
+                {
+                    lastTime = nowTime - properDeltaT - 1;
+                    trueLastTime = lastTime;
+                    
+                    me.mustUpdateScheduled = false;
+                    
+                    me.insturment.cancelScheduledNotes();
+                    me.insturment2.cancelScheduledNotes();
+                }
+                
+                var schedulePlan = Math.min(Math.floor((nowTime - trueLastTime) / properDeltaT), maxBeats);
+                
+                if (schedulePlan >= 3)
+                {
+                    schedulePlan *= 4;
+                }
+                
+                if (schedulePlan === 0)
+                {
+                    schedulePlan = 1;
+                }
+                
+                var shouldScheduleExtraBeats = (lastBeatsScheduled > 1 && (nowTime - trueLastTime) / (properDeltaT || 1) > lastBeatsScheduled / 2.0);
+                
+                if (shouldScheduleExtraBeats)
+                {
+                    me.insturment.cancelScheduledNotes();
+                    me.insturment2.cancelScheduledNotes();
+                    
+                    lastTime = nowTime - properDeltaT - 1;
+                    
+                    if (schedulePlan * properDeltaT <= lastTime + properDeltaT * 4)
+                    {
+                        schedulePlan *= 8;
+                    }
+                }
+                
+                // If a specific number of beats to pre-generate has been requested,
+                if (me.mustThinkAhead !== 0)
+                {
+                    // Cancel everything already scheduled.
+                    me.insturment.cancelScheduledNotes();
+                    me.insturment2.cancelScheduledNotes();
+                    
+                    // Note the number to schedule.
+                    schedulePlan = me.mustThinkAhead;
+                    me.mustThinkAhead = 0;
+                }
+                
+                var scheduleCount = 1;
+                if (nowTime - lastTime >= properDeltaT || shouldScheduleExtraBeats)
+                {
+                    scheduleCount = schedulePlan; /* Determine the number of beats to schedule. */
+                    
+                    lastProperDeltaT = properDeltaT;
+                    
+                    lastBeatsScheduled = scheduleCount;
+                    
+                    for (var i = 0; i < scheduleCount; i++)
+                    {
+                        var playAtTime = lastTime + properDeltaT + me.timeOffset;
+                        
+                        if (playAtTime < nowTime)
+                        {
+                            playAtTime = nowTime;
+                        }
+                        
+                        // Convert to seconds.
+                        playAtTime /= 1000;
+                        
+                        if(this.changePitch != 0)
+                        {
+                            this.beat++;
+                            if (this.beat >= this.changePitch)
+                            {
+                                this.insturment2.play(this.playTime, playAtTime);
+                                this.beat=0;
+                            }
+                            else
+                            {
+                                this.insturment.play(this.playTime, playAtTime);
+                            }
+                        } 
+                        else
+                        {
+                            this.insturment.play(this.playTime, playAtTime);
+                        }
+                        
+                        // Modify the last time.
+                        var newTime = lastTime + properDeltaT;
+                        
+                        if (nowTime - properDeltaT > newTime || newTime > nowTime + properDeltaT * 2)
+                        {
+                            newTime = nowTime;
+                        }
+                        
+                        lastTime = newTime;
+                        
+                        if (i === 0)
+                        {
+                            trueLastTime = newTime;
+                        }
+                        
+                        nowTime += properDeltaT;
+                    }
+                }
+                
+                if (!shouldStopPlaying)
+                {
+                    requestAnimationFrame(function () { me.play(); });
+                    
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            };
+            
+            this.addLabelToElement = function (text)
+            {
+                var label = document.createElement("span");
+                label.innerHTML = text+" ";
+                this.element.appendChild(label);
+            };
+            
+            this.addSlider = function (min, max, value, onChange, width)
+            {
+                var slider = document.createElement("input");
+                slider.type = "range";
+                slider.min = min || 0;
+                slider.max = max === undefined ? 100 : max;
+                slider.value = value === undefined ? 0 : value;
+                
+                if (width !== undefined)
+                {
+                    slider.style.width = width;
+                }
+                
+                if(onChange !== undefined)
+                {
+                    slider.addEventListener("input", function () 
+                    { 
+                        var value = parseFloat(this.value + "");
+                        
+                        if (!isNaN(value))
+                        {
+                            onChange(this.value);
+                        }
+                    });
+                    
+                    slider.addEventListener("dblclick", function() 
+                    {
+                        this.type = (this.type === "number") ? "range" : "number";
+                    });
+                }
+                
+                this.element.appendChild(slider);
+                
+                return slider;
+            };
+            
+            this.addSelect = function (options, onChange)
+            {
+                var select = document.createElement("select");
+                
+                for(var i=0; i<options.length; i++)
+                {
+                    var option = document.createElement("option");
+                    option.value = options[i];
+                    option.innerHTML = options[i];
+                    select.appendChild(option);
+                }
+                
+                
+                if(onChange !== undefined)
+                {
+                    select.addEventListener("change", function () { onChange(select.value); });
+                }
+
+                this.element.appendChild(select);
+                return select;
+            };
+            
+            this.addButton = function(text, onChange)
+            {
+                var buttonElement = document.createElement("button");
+                
+                buttonElement.textContent = text;
+                
+                buttonElement.addEventListener("click", function()
+                {
+                    onChange.apply(this, []);
+                });
+                
+                this.element.appendChild(buttonElement);
+                
+                return buttonElement;
+            };
+            
+            this.addLineBreak = function()
+            {
+                var lineBreakElement = document.createElement("br");
+                
+                this.element.appendChild(lineBreakElement);
+                
+                return lineBreakElement;
+            };
+            
+            this.setUp=function()
+            {
+                this.insturment2.oscillator.frequency.value = 440;
+                
+                this.addLabelToElement("Tempo");
+                
+                this.tempoSlider = this.addSlider(0, 400, this.bpm, function ()
+                {
+                    me.setBPM(parseFloat(me.tempoSlider.value));
+                    me.noteUpdate();
+                });
+
+                this.tempoSlider.addEventListener("change", function ()
+                {
+                    me.setBPM(parseFloat(this.value));
+                    me.noteUpdate();
+                });
+                
+                this.element.appendChild(this.tempoSlider);
+                
+                this.addLineBreak();
+                
+                this.tempoInput = document.createElement("input");
+                this.tempoInput.type = "number";
+                this.tempoInput.value = this.bpm;
+                
+                this.tempoInput.addEventListener("input", function ()
+                {
+                    me.setBPM(parseFloat(this.value));
+                    me.noteUpdate();
+                });
+                
+                this.element.appendChild(this.tempoInput);
+                
+                this.addLineBreak();
+
+                this.addLabelToElement("Sound-Pitch");
+                this.metronomeInsturmentPitchSlider = this.addSlider(0, 3000, this.insturment.oscillator.frequency.value, function (value) 
+                { 
+                    me.insturment.oscillator.frequency.value = parseFloat(value);
+                    me.noteUpdate();
+                }, "50%");
+                
+                this.addLineBreak();
+
+                this.addLabelToElement("Measure-Sound Pitch");
+                this.metronomeInsturmentPitchSlider = this.addSlider(0, 3000, this.insturment2.oscillator.frequency.value, function (value) 
+                {
+                    me.insturment2.oscillator.frequency.value = parseFloat(value);
+                    me.noteUpdate();
+                }, "40%");
+                
+                this.addLineBreak();
+
+                this.addLabelToElement("Sound-Length");
+                this.metronomeInsturmentPitchSlider = this.addSlider(0, 1000, this.playTime, function (value) { me.playTime = parseFloat(value); me.noteUpdate(); });
+                
+                this.addLineBreak();
+                
+                this.addLabelToElement("Beat Click: Volume");
+                this.metronomeInsturmentPitchSlider = this.addSlider(0, 100, this.insturment.getVolume() * 100, function (value) { me.insturment.setVolume(parseFloat(value) / 100); me.noteUpdate(); });
+                
+                this.addLineBreak();
+                
+                this.addLabelToElement("Measure Click: Volume");
+                this.metronomeInsturmentPitchSlider = this.addSlider(0, 100, this.insturment2.getVolume() * 100, function (value) { me.insturment2.setVolume(parseFloat(value) / 100); me.noteUpdate(); });
+                
+                this.addLineBreak();
+
+                this.addLabelToElement("Sound-Type");
+                this.metronomeInsturmentWaveTypeSelect = this.addSelect(["sine", "triangle", "square", "sawtooth"], function (value) 
+                { 
+                    me.insturment.oscillator.type = value; 
+                    me.insturment2.oscillator.type = value; 
+                    me.noteUpdate(); 
+                });
+                
+                this.addLineBreak();
+                
+                var fadeOptions = { "Disabled": "nofade", "Enabled": "fade" };
+                
+                var fadeOptionsValues = [];
+                
+                for(var i in fadeOptions)
+                {
+                    fadeOptionsValues.push(i);
+                }
+                
+                this.addLabelToElement("Fade");
+                this.addSelect(fadeOptionsValues, function (value)
+                {
+                    value = fadeOptions[value];
+                    
+                    var fadeGain = (value === "fade");
+                    
+                    me.insturment.fadeGain = fadeGain;
+                    me.insturment2.fadeGain = fadeGain;
+                    
+                    me.noteUpdate();
+                }); 
+                
+                this.addLineBreak();
+                
+                this.addLabelToElement("Change Pitch");
+                
+                this.changePitchSelect = this.addSelect(["None", "Change Once/4 beats", "Change Once/3 beats", "Change Once/2 beats", "Other"], function(value)
+                {
+                    me.changePitch=0; 
+                    
+                    if(value!="None")
+                    {
+                        me.changePitch=4;
+                        if(value == "Change Once/3 beats")
+                        {
+                            me.changePitch=3;
+                        }
+                        else if(value == "Other")
+                        {
+                            me.changePitch=parseInt(prompt("Number of beats / potential change in pitch.", "6"));
+                        }
+                        else if(value == "Change Once/2 beats")
+                        {
+                            me.changePitch = 2;
+                        }
+                    }
+                    
+                    me.noteUpdate();
+                });
+                
+                this.addLineBreak();
+                
+                this.addButton("Prepare 1,000 Beats", function()
+                {
+                    me.mustThinkAhead = 1000;
+                    me.noteUpdate();
+                });
+                
+                this.addButton("Stop Metronome", function()
+                {
+                    me.noteUpdate();
+                    me.stop();
+                });
+                
+                this.addLabelToElement("<"+"div class='creationInfo'>Made using a JavaScript AudioContext.<"+"/"+"div"+">");
+            };
+            
+            this.go = function ()
+            {
+                this.setUp();
+                this.play();
+            };
+            
+            this.stop = function ()
+            {
+                // Clear scheduled sounds.
+                this.insturment.cancelScheduledNotes();
+                this.insturment2.cancelScheduledNotes();
+                
+                // Stop both insturments.
+                this.insturment.stop();
+                this.insturment2.stop();
+                
+                // Stop the animation loop.
+                shouldStopPlaying = true;
+                
+                // Hide controls.
+                this.element.style.filter = "opacity(100%)";
+                this.element.style.width = this.element.clientWidth + "px";
+                this.element.style.height = this.element.clientHeight + "px";
+                
+                requestAnimationFrame(function()
+                {
+                    me.element.style.transition = "0.5s ease filter, 0.6s ease width, 0.6s ease height";
+                    
+                    requestAnimationFrame(function()
+                    {
+                        me.element.style.filter = "opacity(0%)";
+                        me.element.style.width = "0px";
+                        me.element.style.height = "0px";
+                    });
+                });
+                
+                // Destroy controls, after hidden (in 0.6s).
+                setTimeout(function()
+                {
+                    me.element.outerHTML = "";
+                }, 0.6 * 1000); // Convert milliseconds to seconds.
+            };
+        }
+    </script>
+    <script>
+        try
+        {    
+            var startButton = document.createElement("button");
+            
+            startButton.setAttribute("class", "startButton");
+            
+            var audioCtx = undefined;
+            
+            startButton.onclick = function()
+            {
+                var metronome = new Metronome(undefined, audioCtx);
+                metronome.go();
+                
+                audioCtx = metronome.audioContext;
+            };
+            
+            startButton.innerHTML = "Start Metronome";
+            
+            document.body.appendChild(startButton);
+        } 
+        catch(e)
+        {
+            e = e || "No error message.";
+            
+            var errorMessageArea=document.getElementById("metronomeControlsArea");
+            errorMessageArea.innerHTML = "There was an error loading the metronome. Error: " + e.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;") + ". Try using a different browser.";
+        }
+    </script>
+</body>
+</html>

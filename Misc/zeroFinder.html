@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang = "en">
+<head>
+<meta name = "viewport" content = "width=device-width,initial-scale=1.0,min-scale=1.0,max-scale=1.4"/>
+<meta name = "charset" content = "utf-8"/>
+<meta name = "encoding" content = "utf-8"/>
+<title>Zero Finder</title>
+<style>
+body
+{
+    background-image: radial-gradient(rgba(255, 255, 255, 0.8), black, black);
+    background-size: 100vw 10vh;
+    background-position: 0vw 96vh;
+    background-repeat: no-repeat;
+    background-color: black;
+}
+
+.mainContent
+{
+    box-shadow: 6px 5px 4px rgba(255, 255, 0, 0.4);
+    
+    margin-left: auto;
+    margin-right: auto;
+    
+    max-width: 400px;
+    
+    color: black;
+    background-color: white;
+    
+    border-radius: 20px;
+    
+    padding: 10px;
+}
+
+.smallText
+{
+    font-size: 8pt;
+}
+
+.graphDataKey
+{
+    display: table-cell;
+    font-weight: bold;
+    
+    padding-right: 5px;
+}
+
+.graphDataValue
+{
+    display: table-cell;
+    background-color: white;
+    border-radius: 4px;
+    
+    box-shadow: inset 1px 2px 3px rgba(0, 0, 0, 0.4);
+    word-wrap: break-word;
+    padding: 2px;
+}
+
+canvas
+{
+    width: 100%;
+}
+
+input
+{
+    width: 150px;
+    border: 1px solid gray;
+    background-color: white;
+    font: 12pt Serif;
+    color: black;
+    
+    text-shadow: 3px 3px 2px rgba(0, 0, 0, 0.25);
+    border-radius: 3px;
+}
+</style>
+</head>
+<body>
+<script>
+var StringHelper = {};
+
+// Convert text in camel case (textInCamelCaseLikeThis) to
+//text with words separated by spaces (Text With Words Separated [sic.] By Spaces).
+StringHelper.camelCaseToSpacedText = function(camelCaseText)
+{
+    var result = "";
+    
+    if (camelCaseText.length > 0)
+    {
+        result = camelCaseText.charAt(0).toUpperCase();
+        
+        var currentChar;
+        
+        for (var i = 1; i < camelCaseText.length; i++)
+        {
+            currentChar = camelCaseText.charAt(i);
+            
+            if (currentChar.toUpperCase() === currentChar)
+            {
+                result += " " + currentChar;
+            }
+            else
+            {
+                result += currentChar;
+            }
+        }
+    }
+    
+    return result;
+};
+
+// Graphs a function and returns information: an object with properties area, roots, and averageSlope.
+function graphAndInfo(ctx, useFunction, minX, maxX, divisions, rootsIterations)
+{
+    divisions = divisions || ctx.canvas.width;
+    rootsIterations = rootsIterations !== undefined ? rootsIterations : 10;
+    
+    let deltaX = ctx.canvas.width / divisions;
+    console.warn(deltaX);
+    var y, minY = 0, maxY = 0;
+
+    function normalizeX(x, translate)
+    {
+        // Determine the center-point.
+        var centerX = (minX + maxX) / 2;
+        var span = maxX - minX;
+
+        x /= ctx.canvas.width;
+        x *= span;
+
+        if(translate === undefined || translate)
+        {
+            x += minX;
+        }
+
+        return x;
+    }
+
+    function xToScreen(x)
+    {
+        var span = maxX - minX;
+
+        x -= minX;
+
+        x /= span;
+        x *= ctx.canvas.width;
+
+        return x;
+    }
+
+    console.log("Nx0: " + normalizeX(0) + ", Nx1: " + normalizeX(ctx.canvas.width) + ".");
+
+    function outputYToScreen(y)
+    {
+        var span = maxY - minY;
+        y -= minY;
+        y /= span; // y is in [0, 1].
+        y *= ctx.canvas.height; // y is in [0, canvas height].
+
+        return ctx.canvas.height - y;
+    }
+
+    var firstTime = true;
+
+    var rootsApprox = [];
+    var lastWasPositive = false;
+
+    // Determine the maximum and minimum y-values.
+    for(var x = 0; x < ctx.canvas.width; x += deltaX)
+    {
+        y = useFunction(normalizeX(x));
+
+        if (y === undefined || y === null || isNaN(y))
+        {
+            continue;
+        }
+
+        if (y < minY || firstTime)
+        {
+            minY = y;
+        }
+
+        if (y > maxY || firstTime)
+        {
+            maxY = y;
+        }
+
+        if (!firstTime)
+        {
+            if(lastWasPositive !== (y > 0))
+            {
+                rootsApprox.push(normalizeX(x));
+            }
+        }
+
+        if (y > 0)
+        {
+            lastWasPositive = true;
+        }
+        else
+        {
+            lastWasPositive = false;
+        }
+
+        firstTime = false;
+    }
+
+    //console.log("MINY: " + minY + ", MAXY: " + maxY);
+    //console.log("T1: " + outputYToScreen(minY) + ", " + outputYToScreen(maxY));
+
+    var area = 0.0;
+    var realY, realMidY = (minY + maxY) / 2;
+    var midY = outputYToScreen(0);//realMidY);
+    var areaDeltaX = Math.abs(normalizeX(deltaX, false));
+    var iterations = 0;
+
+    var lastRealY = useFunction(normalizeX(0));
+    var lastY = outputYToScreen(lastRealY);
+
+    ctx.strokeStyle = "black";
+
+    // Graph!
+    for(var x = 0; x < ctx.canvas.width; x += deltaX)
+    {
+        realY = useFunction(normalizeX(x + deltaX));
+
+        if (realY === undefined || realY === null || isNaN(realY))
+        {
+            continue;
+        }
+
+        y = outputYToScreen(realY);
+
+        ctx.beginPath();
+        ctx.moveTo(x, midY);
+        ctx.lineTo(x + deltaX, midY);
+        ctx.lineTo(x + deltaX, y);
+        ctx.lineTo(x, lastY);
+        ctx.lineTo(x, midY);
+        ctx.stroke();
+        
+        area += areaDeltaX * (realY + lastRealY) / 2;
+
+        lastRealY = realY;
+        lastY = y;
+    }
+
+    var roots = [], x, y1, y2, m;
+    var ndx = areaDeltaX;
+
+    // Refine the roots.
+    for(var i = 0; i < rootsApprox.length; i++)
+    {
+        x = rootsApprox[i];
+
+        for(var j = 0; j < rootsIterations; j++)
+        {
+            // Find the tangent line.
+            y1 = useFunction(x + ndx);
+            y2 = useFunction(x);
+
+            m = (y2 - y1) / (-ndx);
+
+            ctx.beginPath();
+            ctx.strokeStyle = "rgba(0, 255, 100, 0.5)";
+            var pointX = x, pointY = y2;
+            var x1 = 0, x2 = ctx.canvas.width;
+            ctx.moveTo(xToScreen(minX), outputYToScreen(m * (minX - pointX) + pointY));
+            ctx.lineTo(xToScreen(maxX), outputYToScreen(m * (maxX - pointX) + pointY));
+            ctx.stroke();
+
+            x = (0 - y2) / m + x;
+        }
+
+        roots.push(x);
+    }
+
+    var averageSlope;
+
+    try
+    {
+        averageSlope = (useFunction(maxX) - useFunction(minX)) / (maxX - minX);
+    }
+    catch(e)
+    {
+        averageSlope = null;
+    }
+
+    return {"area": area, "roots": roots, "averageSlope": averageSlope};
+}
+
+function main()
+{
+    var parentElement = document.createElement("div");
+    parentElement.setAttribute("class", "mainContent");
+    
+    var createLabeledInput = function(label, parent, value)
+    {
+        var container = document.createElement("div");
+        var labelSpan = document.createElement("span");
+        labelSpan.innerHTML = label;
+
+        var input = document.createElement("input");
+        input.value = value;
+
+        container.appendChild(labelSpan);
+        container.appendChild(input);
+        
+        parent.appendChild(container);
+
+        return input;
+    };
+
+    var equationInput = createLabeledInput("Equation: ", parentElement, "2*x");
+    var minXInput = createLabeledInput("MinX: ", parentElement, "0");
+    var maxXInput = createLabeledInput("MaxX: ", parentElement, "4");
+    var deltaXInput = createLabeledInput("Divide: ", parentElement, "100");
+    var newtonIterationsInput = createLabeledInput("<span class='smallText'>Netwton's Method Times:</span> ", parentElement, "10");
+    var areaView = document.createElement("div");
+    var canvas = document.createElement("canvas");
+
+    canvas.setAttribute("class", "displayCanvas");
+
+    var ctx = canvas.getContext("2d");
+    
+    var updateGraphAndAreaView = function(equation, minX, maxX, deltaX, newtonsIterations, equationText)
+    {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+        var graphInfoHTML = "<center><h2>" + equationText + "</h2></center>";
+        graphInfoHTML += "<div style='display: table;'>";
+        var graphData = graphAndInfo(ctx, equation, minX, maxX, deltaX, newtonsIterations);
+        
+        var label;
+        
+        for (var key in graphData)
+        {
+            label = StringHelper.camelCaseToSpacedText(key);
+            
+            var value = graphData[key] !== undefined ? graphData[key] : "N/A";
+            
+            if (key === "roots" && value.length > 0)
+            {
+                value = "x = " + (value.toString()).replace(/[,]([ ]){0}/g, ", <br/>x = ");
+            }
+            
+            graphInfoHTML += "<div style='display: table-row;'>";
+            graphInfoHTML += "<span class = 'graphDataKey'>" + label + "</span>";
+            graphInfoHTML += "<span class = 'graphDataValue'>" + value + "</span>";
+            graphInfoHTML += "</div>";
+        }
+        
+        graphInfoHTML += "</div>";
+        
+        areaView.innerHTML = graphInfoHTML;
+    };
+
+    var updateFromInputs = function()
+    {
+        var equationText = equationInput.value;
+        var minX = eval(minXInput.value);
+        var maxX = eval(maxXInput.value);
+        var deltaX = Math.abs(eval(deltaXInput.value));
+        var newtonIterations = eval(newtonIterationsInput.value);
+        
+        var lastEquationText = equationText + "";
+        var iterations = 0;
+        
+        do
+        {
+            equationText = equationText.replace(/(\d|\)|\|){1}([a-zA-Z]|\(){1}/g, "$1 * $2"); // Multiplication
+            equationText = equationText.replace(/\|(.+)\|/g, "(abs($1))"); // Absolute values.
+            equationText = equationText.replace(/((?:\w+)|(?:\([a-zA-Z0-9_%]+?\)))\s?[\^]\s?((?:\w+)|(?:\(.+?\)))/g, "(pow($1, $2))"); // Powers
+            iterations ++;
+        }
+        while (equationText !== lastEquationText && iterations < 100);
+        
+        console.log("Equation: " + equationText + ", minX: " + minX + ", maxX: " + maxX + ", dX: " + deltaX + ", newton's: " + newtonIterations  + ".");
+
+        let sin = Math.sin, tan = Math.tan, ln = Math.log, e = Math.E, pi = Math.PI, cos = Math.cos, pow = Math.pow, abs = Math.abs;
+        
+        try
+        {
+            var equation = function(x) { return eval(equationText); };
+        
+            console.log("Equation(0): " + equation(0));
+            updateGraphAndAreaView(equation, minX, maxX, deltaX, newtonIterations, equationText);
+        }
+        catch(e)
+        {
+            areaView.innerHTML = "Error: " + e;
+        }
+    };
+
+    equationInput.oninput = function()
+    {
+        updateFromInputs();
+    };
+
+    minXInput.oninput = function()
+    {
+        updateFromInputs();
+    };
+
+    maxXInput.oninput = function()
+    {
+        updateFromInputs();
+    };
+
+    deltaXInput.oninput = function()
+    {
+        updateFromInputs();
+    };
+    
+    newtonIterationsInput.oninput = function()
+    {
+        updateFromInputs();
+    };
+
+    parentElement.appendChild(canvas);
+    parentElement.appendChild(areaView);
+    
+    document.body.appendChild(parentElement);
+
+    updateFromInputs();
+}
+
+main();
+</script>
+</body>
+</html>

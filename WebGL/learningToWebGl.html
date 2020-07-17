@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head><title>Learning to WebGL</title></head>
+<body style = "background-image: radial-gradient(red, white, blue, green, orange);">
+<canvas id = "c">No HTML5 Canvas Support</canvas>
+
+<script id="vs" type = "webGLShader">
+attribute vec4 a_position;
+varying vec4 v_color;
+varying vec2 v_position;
+
+void main()
+{
+    gl_Position = a_position;
+    
+    v_color = gl_Position * 0.5 + 0.5;
+    v_position = gl_Position.xy;
+}
+</script>
+
+<script id="fs" type = "webGLShader">
+precision mediump float;
+varying vec4 v_color;
+varying vec2 v_position;
+uniform float u_time;
+
+void main()
+{
+    vec4 colorCopy = v_color;
+    
+    //float avg = (colorCopy[0] + colorCopy[1] + colorCopy[2]) / 3.0;
+    
+    
+    if(v_position.x != 0.0 && u_time > 0.0)
+    {
+        colorCopy[0] = (sin(cos(v_position.x / (u_time + 0.1)) / v_position.x * 6.28 + tan(u_time * 10.0)) + 1.0) / 2.0;
+        colorCopy[1] = (cos(v_position.y / v_position.x * 6.28 + u_time * 10.0) + 1.0) / 2.0;
+        colorCopy[2] = colorCopy[1] / 2.0; //(tan(v_position.x * 6.28  * tan(u_time / v_position.y)) + 1.0) / 2.0;
+    }
+    /*if(avg != 0.0)
+    {
+        colorCopy[2] = (sin(1.0/(avg)) + 1.0)/2.0;
+    }*/
+    
+    gl_FragColor = colorCopy * v_color;
+}
+</script>
+
+<script>
+function compileShader(gl, type, id)
+{
+    var shader = gl.createShader(type);
+    var source = document.getElementById(id).text;
+    console.log(source);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    
+    var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+    if(success)
+    {
+        return shader;
+    }
+    
+    // Cleanup on error.
+    console.log(success);
+    console.warn(gl.getShaderInfoLog(shader));
+    gl.deleteShader(shader);
+}
+
+function linkIntoProgram(gl, vertexShader, fragmentShader)
+{
+    var program = gl.createProgram();
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.linkProgram(program);
+    
+    if(gl.getProgramParameter(program, gl.LINK_STATUS))
+    {
+        return program;
+    }
+    
+    console.warn(gl.getProgramInfoLog(program));
+    
+    gl.deleteProgram(program);
+}
+
+var canvas = document.querySelector("#c");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+canvas.style.left = 0;
+canvas.style.top = 0;
+canvas.style.position = "absolute";
+
+var gl = canvas.getContext("webgl");
+var vertexShader = compileShader(gl, gl.VERTEX_SHADER, "vs"),
+    fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER, "fs");
+    
+var program = linkIntoProgram(gl, vertexShader, fragmentShader);
+var positionLocation = gl.getAttribLocation(program, "a_position");
+var timeLocation = gl.getUniformLocation(program, "u_time");
+var positionBuffer = gl.createBuffer();
+
+gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+gl.clearColor(0.5, 0.1, 0.5, 1.0);
+
+gl.clear(gl.COLOR_BUFFER_BIT);
+
+
+gl.useProgram(program);
+
+
+gl.enableVertexAttribArray(positionLocation);
+
+// Bind the array buffer to the attribute in the shader.
+gl.vertexAttribPointer(positionLocation, 2, // 2 elements per calling of shaders.
+ gl.FLOAT, // data type
+  false, // No normalization.
+   0, 0); // Stride and offset.
+
+function animate()
+{
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    
+    var positions = 
+    [
+        -1, -1,
+        -1, 1,
+        1, -1,
+        1, -1,
+        1, 1,
+        -1, 1
+    ];
+    /*
+    [
+     0-Math.tan((new Date() / 700))/3, 0 - Math.sin(i),
+     0, 0.5/i,
+     0.5/i, 0,
+     0.5/i, 0,
+     0.5/i, 0.5/i,
+     0, 0.5/i,
+    ];*/
+
+
+
+    // Copy to the position buffer on the GPU.
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), 
+        gl.STATIC_DRAW); // Data won't change.
+
+
+    gl.uniform1f(timeLocation, Math.cos((new Date()).getTime() / 1000.0) + 1.0);
+    //gl.uniform4f(colorLocation, 0, 0.5, 0, 1);//(Math.sin(i * 6.28) + 1) / 2, (Math.cos(i) + 1) / 2, (Math.sin(i*100) + 1) / 2, 1);
+       
+    var primitiveType = gl.TRIANGLES;
+    var offset = 0;
+    var count = 6;
+    gl.drawArrays(primitiveType, offset, count);
+    
+    requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- By Henry Heino -->
+<meta charset = "utf-8"/>
+<meta name = "viewport" content = "width=device-width, initial-scale=1"/>
+<link rel = "icon" href = "../favicon.png"/>
+
+<title>Index of WebGL Projects</title>
+<script src = "Vector.js"></script>
+<script src = "Matrix.js"></script>
+<script src = "Objects.js"></script>
+
+<style>
+.displayCanvas
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+body
+{
+    background-image: radial-gradient(rgba(0, 255, 255, 0.5), white);
+    background-size: 5px 5px;
+}
+
+.errorDisplay
+{
+    border: 5px groove gray;
+    border-radius: 10px;
+    padding: 10px;
+    
+    background-image: radial-gradient(white, gray);
+    background-size: 5px 5px;
+    
+    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.4);
+    
+    position: fixed;
+    top: 20px;
+    right: 10px;
+    left: 10px;
+    bottom: 20px;
+    
+    filter: opacity(80%) sepia(50%);
+}
+
+.errorDisplay > p
+{
+    color: red;
+    text-indent: 20px;
+}
+
+#content > div
+{
+    max-width: 500px;
+    
+    background-color: rgba(255, 255, 255, 0.6);
+    box-shadow: -4px -4px 3px rgba(0, 0, 0, 0.4);
+    border-radius: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    
+    left: auto;
+    right: auto;
+    
+    overflow-y: auto;
+    
+    margin-left: auto;
+    margin-right: auto; 
+}
+
+#content
+{
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    top: 0;
+    left: 0;
+    z-index: 999;
+}
+
+#content h1
+{
+    border-bottom: 1px solid black;
+    text-shadow: 1px 1px 1px rgba(0, 255, 0, 0.1);
+}
+
+#content p
+{
+    text-indent: 15px;
+}
+</style>
+
+</head>
+<body>
+<div id = "content">
+<div>
+<h1>Index of WebGL Projects</h1>
+<p>Over the summer of 2018, Henry created several WebGL projects. These were all intended to learn how to use WebGL, so the source of each is very messy. Writing messy code at first can be great for learning! None of these are intended to be more than a demonstration of what can be done with WebGL -- lighting scenes, filtering images, and rotating objects. </p>
+
+<p>WebGL provides fast, graphics-proccessing-unit accelerated controls. These can be used to generate 3D graphics, filter images, or even graph a function.</p>
+
+<p>To generate an image using WebGL, vertex-shaders and fragment-shaders are created an run on the graphics-processing-unit. The vertex-shader applies matrix transformations to a list of vertices -- translating each vertex. All projects included use the "GL.TRIANGLES" option to render triangles using every three vertices as vertices for the triangles. The fragment-shader is then run for every pixel to be displayed in each triangle, determining the color of each pixel. Information can be given to both the vertex and fragment shaders. For example, the location of a light source and the location of the camera are given to the vertex and fragment shaders in this WebGL program, to calculate the intensity of lighting for a point on a triangle.</p>
+
+<ul id = "webGLList">
+ <li><a href = "learningToWebGl.html">WebGL 1</a></li>
+</ul>
+
+<script>
+    var listOfPages = document.getElementById("webGLList");
+    var listItem, link;
+    
+    for(var i = 2; i < 9; i++)
+    {
+        listItem = document.createElement("li");
+        link = document.createElement("a");
+        
+        link.setAttribute("href", "webGL" + i + ".html");
+        link.innerHTML = "WebGL " + i;
+        
+        listItem.appendChild(link);
+        listOfPages.appendChild(listItem);
+    }
+</script>
+
+<h2>Refrences</h2>
+<p style = "margin-left: -10px; text-indent: 10px;"><a href="https://webglfundamentals.org/">This tutorial</a> was used to learn WebGL.</p>
+
+</div> 
+</div>
+
+<script id = "vertex-shader" type = "glsl">
+attribute vec4 a_normal;
+attribute vec4 a_position;
+
+uniform vec4 u_color;
+
+uniform mat4 u_view;
+uniform mat4 u_world;
+uniform mat4 u_worldI;
+uniform mat4 u_camera;
+
+uniform vec4 u_lightPosition;
+uniform vec3 u_cameraPosition;
+
+varying vec4 v_color;
+varying vec3 v_normal;
+varying vec4 v_surfaceToLight;
+varying vec3 v_surfaceToCamera;
+
+void main()
+{
+    gl_Position = a_position * u_world * u_camera * u_view;
+
+    v_normal = a_normal.xyz * mat3(u_world);
+    v_color = u_color;
+    
+    vec4 currentWorldPosition = a_position * u_world;
+    vec4 lightPosition = u_lightPosition;
+    
+    v_surfaceToLight = u_lightPosition - currentWorldPosition;
+    v_surfaceToCamera = u_cameraPosition - currentWorldPosition.xyz;
+}
+</script>
+
+<script id = "fragment-shader" type = "glsl">
+precision mediump float;
+
+varying vec4 v_color;
+varying vec3 v_normal;
+varying vec4 v_surfaceToLight;
+varying vec3 v_surfaceToCamera;
+
+uniform float u_shinePower;
+
+void main()
+{
+    vec3 normal = normalize(v_normal.xyz);
+    vec3 vecToLight = normalize(v_surfaceToLight.xyz);
+    vec3 vecToCamera = normalize(v_surfaceToCamera);
+
+    float lightValue = ( dot(normal, vecToLight) );
+    
+    vec3 halfVector = normalize(vecToLight + vecToCamera);
+    float specular = dot(normal, halfVector);
+    
+    if(specular > 0.0 && lightValue > 0.0)
+    {
+        specular = pow(specular, u_shinePower);
+    }
+    else
+    {
+        specular = 0.0;
+    }
+    
+    gl_FragColor = v_color;
+    
+    gl_FragColor.rgb *= lightValue;
+    gl_FragColor.rgb += specular;
+}
+</script>
+
+<script>
+var canvas = document.createElement("canvas");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+canvas.style.width = "100vw";
+canvas.style.height = "100vh";
+
+
+var overlayCanvas = document.createElement("canvas");
+overlayCanvas.width = window.innerWidth;
+overlayCanvas.height = window.innerHeight;
+
+var ctx = overlayCanvas.getContext("2d");
+ctx.fillStyle = "white";
+
+canvas.setAttribute("class", "displayCanvas");
+overlayCanvas.setAttribute("class", "displayCanvas");
+
+var gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+
+function showError(title, content)
+{
+    var errorElement = document.createElement("div");
+    var titleElement = document.createElement("h1");
+    var contentElement = document.createElement("p");
+    
+    errorElement.setAttribute("class", "errorDisplay");
+    
+    titleElement.innerHTML = title.split("<").join("&lt;").split(">").join("&rt;");
+    contentElement.innerHTML = content.split("<").join("&lt;").split(">").join("&rt;");
+    
+    errorElement.appendChild(titleElement);
+    errorElement.appendChild(contentElement);
+    
+    document.body.appendChild(errorElement);
+}
+
+function compileShader(gl, shaderType, source)
+{
+    var shader = gl.createShader(shaderType);
+    gl.shaderSource(shader, source);
+    
+    gl.compileShader(shader);
+    
+    if(gl.getShaderParameter(shader, gl.COMPILE_STATUS))
+    {
+        return shader;
+    }
+    else
+    {
+        showError("Shader Error", gl.getShaderInfoLog(shader));
+        
+        gl.deleteShader(shader);
+    }
+}
+
+function compileShaderFromScriptId(gl, shaderType, scriptId)
+{
+    var scriptContent = document.getElementById(scriptId).text;
+    
+    return compileShader(gl, shaderType, scriptContent);
+}
+
+function linkProgram(gl, vertexShader, fragmentShader)
+{
+    var program = gl.createProgram();
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    
+    gl.linkProgram(program);
+    
+    if(gl.getProgramParameter(program, gl.LINK_STATUS))
+    {
+        return program;
+    }
+    else
+    {
+        showError("Linker Error", gl.getProgramInfoLog(program));
+        
+        gl.deleteProgram(program);
+    }
+}
+
+var vertexShader = compileShaderFromScriptId(gl, gl.VERTEX_SHADER, "vertex-shader");
+var fragmentShader = compileShaderFromScriptId(gl, gl.FRAGMENT_SHADER, "fragment-shader");
+
+var program = linkProgram(gl, vertexShader, fragmentShader);
+
+gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+
+gl.clearColor(0.0, 0.0, 0.0, 0.0);
+
+gl.useProgram(program);
+
+var shinePowerLocation = gl.getUniformLocation(program, "u_shinePower");
+gl.uniform1f(shinePowerLocation, 150.0);
+
+var lightPositionLocation = gl.getUniformLocation(program, "u_lightPosition");
+
+var lightPosition = new Vector3(0.0, 2.0, 0.0);
+
+var lightPositionArray = lightPosition.toArray();
+lightPositionArray.push(0);
+
+gl.uniform4fv(lightPositionLocation, lightPositionArray);
+
+var cameraPositionLocation = gl.getUniformLocation(program, "u_cameraPosition");
+
+
+var colorLocation = gl.getUniformLocation(program, "u_color");
+var normalsLocation = gl.getAttribLocation(program, "a_normal");
+var vertexLocation = gl.getAttribLocation(program, "a_position");
+
+var vertexBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+
+var positions = object3D.getScaledCubeVerticies(1 / 20);
+
+gl.enableVertexAttribArray(vertexLocation);
+
+gl.vertexAttribPointer(vertexLocation, 3, // Take 3 elements / calling of shader
+        gl.FLOAT, // Data type.
+        false, // No normalization
+        0, 0); // Stride and offset.
+
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions),
+        gl.STATIC_DRAW);
+        
+
+
+
+var normalsBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, normalsBuffer);
+
+var normals = object3D.getNormals(positions);
+
+gl.enableVertexAttribArray(normalsLocation);
+
+gl.vertexAttribPointer(normalsLocation, 3, // Take 3 elements / calling
+        gl.FLOAT, // Data type.
+        false, // No normalization.
+        0, 0); // Strde and offset.
+        
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW); 
+
+gl.uniform4fv(colorLocation, [1.0, 0.5, 0.0, 1.0]);
+
+var worldMatrix = new Matrix(4, 4);
+worldMatrix.toIdentityMatrix();
+
+//worldMatrix.scale(1 / 5, 1 / 5, 1 / 5);
+
+var viewMatrix = Mat44Helper.perspective(70 * Math.PI / 180, 1, 2000, gl.drawingBufferHeight / gl.drawingBufferWidth, true); //new Matrix(4, 4);
+//viewMatrix.toIdentityMatrix();
+//viewMatrix.setAt(-1, 3, 2);
+
+var cameraMatrix = new Matrix(4, 4);
+cameraMatrix.toIdentityMatrix();
+
+var cameraLocation = new Vector3(2.0, 0.0, -2.0);
+var upDirection = new Vector3(0.0, 1.0, 0.0);
+var lookAt = new Vector3(0.0, 0.0, 0.0);
+
+var worldMatrixLocation = gl.getUniformLocation(program, "u_world");
+var worldMatrixILocation = gl.getUniformLocation(program, "u_worldI");
+var viewMatrixLocation = gl.getUniformLocation(program, "u_view");
+var cameraMatrixLocation = gl.getUniformLocation(program, "u_camera");
+
+gl.uniformMatrix4fv(worldMatrixLocation, false, worldMatrix.to1DArray());
+gl.uniformMatrix4fv(viewMatrixLocation, false, viewMatrix.to1DArray());
+gl.uniformMatrix4fv(cameraMatrixLocation, false, cameraMatrix.to1DArray());
+
+gl.enable(gl.CULL_FACE);
+gl.enable(gl.DEPTH_TEST);
+
+lookAt.x = 1000;
+
+var contentElement = document.getElementById("content");
+
+function animate()
+{
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    
+    if(gl.canvas.clientWidth !== gl.canvas.width || gl.canvas.clientHeigt !== gl.canvas.height)
+    {
+        gl.canvas.width = gl.canvas.clientWidth;
+        gl.canvas.height = gl.canvas.clientHeight;
+        ctx.canvas.width = gl.canvas.clientWidth;
+        ctx.canvas.height = gl.canvas.clientHeight;
+        
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+        
+        viewMatrix = Mat44Helper.perspective(70 * Math.PI / 180, 1, 2000, gl.canvas.height / gl.canvas.width);
+        
+        gl.uniformMatrix4fv(viewMatrixLocation, false, viewMatrix.to1DArray());
+    }
+    
+    //ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    
+    var time = (new Date()).getTime() / 1000;
+    
+    gl.uniform4fv(colorLocation, [1.0, 0.5, 0.0, 1.0]);
+    
+    worldMatrix.save();
+    
+    lightPosition.x = Math.cos(time / 500) * 30;
+    lightPosition.z = Math.sin(time / 500) * 10;
+    lightPosition.y = Math.sin(time / 2000) * 7;
+    
+    worldMatrix.scale(100, 100, 100);
+    worldMatrix.translate(-5.0, -10.0, 32.0);
+    
+    worldMatrix.rotateZ(-0.1);
+    worldMatrix.rotateX(0.2);
+    worldMatrix.rotateY(-0.1);
+    //worldMatrix.rotateY(Math.sin(time / 2000) * Math.PI);//, -Math.cos(time / 2400) * 3 - 2, 0);
+    
+    //lookAt = new Vector3(0.0, 0.0, 0.0);
+    
+    lightPositionArray = lightPosition.toArray();
+    lightPositionArray.push(0);
+
+    gl.uniform4fv(lightPositionLocation, lightPositionArray);
+    gl.uniform3fv(cameraPositionLocation, cameraLocation.toArray());
+    
+    gl.uniform1f(shinePowerLocation, 150.0 - Math.sin(time / 1000) * 10.0);
+    
+    cameraLocation.y = -contentElement.scrollTop / (contentElement.scrollHeight || 1) * 20;
+    
+    cameraMatrix = Mat44Helper.lookAt(cameraLocation, upDirection, lookAt).getInverse();
+    
+    gl.uniformMatrix4fv(worldMatrixLocation, false, worldMatrix.to1DArray());
+    gl.uniformMatrix4fv(worldMatrixILocation, false, worldMatrix.getInverse().transpose().to1DArray());
+    gl.uniformMatrix4fv(cameraMatrixLocation, false, cameraMatrix.to1DArray());
+    
+    gl.drawArrays(gl.TRIANGLES, 0, // Offset
+            positions.length / 3); // Verticies
+            
+    worldMatrix.restore();
+    
+    worldMatrix.save();
+    
+    for(var x = 0; x < 25; x++)
+    {
+        for(var z = 0; z < 25; z++)
+        {
+            worldMatrix.save();
+            
+            gl.uniform4fv(colorLocation, [0.0, 0.5, (Math.sin(x + z) + 1.0) / 2, 1.0]);
+            
+            worldMatrix.translate(-x + 5, Math.tan(x * (z + 1.0) + time / 1000), -1.0 - z + 7.0);
+            
+            worldMatrix.scale(0.25, 0.25, 0.25);
+            
+            gl.uniformMatrix4fv(worldMatrixLocation, false, worldMatrix.to1DArray());
+            
+                    
+            gl.drawArrays(gl.TRIANGLES, 0, // Offset
+                    positions.length / 3); // Verticies
+            
+            worldMatrix.restore();
+            
+        }
+    }
+    
+    worldMatrix.save();
+    
+    gl.uniform4fv(colorLocation, [0.5, 0.5, 0.0, 1.0]);
+    
+    worldMatrix.rotateX(Math.sin((new Date()).getTime() / 1000));
+    
+    worldMatrix.translate(-10, 0, 0);
+    
+    
+    //worldMatrix.rotateY((new Date()).getTime() / 1100);
+    
+    worldMatrix.scale(20, 10, 10);
+    
+    
+    gl.uniformMatrix4fv(worldMatrixLocation, false, worldMatrix.to1DArray());
+    
+            
+    gl.drawArrays(gl.TRIANGLES, 0, // Offset
+            positions.length / 3); // Verticies
+    
+    worldMatrix.restore();
+    
+    worldMatrix.restore();
+    
+    worldMatrix.save();
+    
+    var textVector = new Vector4(0.1, 0.1, 0.1, 1.0);
+    
+    worldMatrix.transformVector(textVector);
+    cameraMatrix.transformVector(textVector);
+    viewMatrix.transformVector(textVector);
+    
+    textVector.x /= textVector.w;
+    textVector.y /= textVector.w;
+    
+    //worldMatrix.scale(0.5, 0.5, 0.25);
+    
+    worldMatrix.translateByVector(lightPosition);
+    
+    gl.uniformMatrix4fv(worldMatrixLocation, false, worldMatrix.to1DArray());
+    gl.uniformMatrix4fv(worldMatrixILocation, false, worldMatrix.getInverse().transpose().to1DArray());
+    
+    gl.drawArrays(gl.TRIANGLES, 0, // Offset
+            positions.length / 3); // Verticies  
+            
+    worldMatrix.restore();      
+    
+    requestAnimationFrame(animate);
+}
+
+animate();
+
+document.body.appendChild(gl.canvas);
+document.body.appendChild(overlayCanvas);
+
+overlayCanvas.style.zIndex = 10;
+</script>
+</body>
+</html>

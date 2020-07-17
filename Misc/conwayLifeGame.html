@@ -1,0 +1,460 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Conway's Game of Life</title>
+    <style>
+        .mainDiv
+        {
+            box-shadow: 4px 3px 5px rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            
+            margin-left: auto;
+            margin-right: auto;
+            
+            max-width: 1500px;
+            text-align: center;
+            
+            background-color: white;
+        }
+        
+        canvas
+        {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            
+            border-radius: 10px;
+            
+            box-shadow: -2px -3px 5px rgba(0, 0, 0, 0.4);
+        }
+        
+        body
+        {
+            background-image: radial-gradient(#ff4444, #ffffaa);
+            background-size: 5px 5px;
+        }
+        
+        @media print
+        {
+            body
+            {
+                background-image: none;
+            }
+            
+            .mainDiv
+            {
+                box-shadow: none;
+                background-color: none;
+                max-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class = "mainDiv">
+    <p>
+        Set to: <input id="setTo" type="text" onmouseout="this.blur();" />
+        Rules: <input id="rulesInput" type="number" onmouseout="this.blur();" />
+        Max colors: <input id="maxColor" type="number" onmouseout="this.blur();" />
+        Guidelines: <input id="guidelines" type="checkbox" onmouseout="this.blur();" />
+    </p>
+</div>
+    <canvas id="grid"></canvas>
+<div class = "mainDiv">
+    <p><b>Controls:</b> <button id = "simulateEscape">Escape</button> runs the simulation, and the <button id = "simulateA">"A" key</button> stops it. Click to change the value of squares. <button id = "stepOnce">Step once.</button></p>
+</div>
+    <script>
+        function Grid()
+        {
+            this.grid = [];
+            this.oldGrid = [];
+            this.width = 100;
+            this.height = 50;
+            this.cellWidth=10;
+            this.cellHeight = 10;
+            this.mustStop = false;
+            this.wrap = true;
+            this.maxColors = 2;
+            this.rules = 1;
+            this.dontUpdateUntilEnd = true;
+            this.guides = false;
+
+            for (var x = 0; x < this.width; x++)
+            {
+                var row = [];
+                for(var y=0; y<this.height; y++)
+                {
+                    row.push(0);
+                }
+                this.grid.push(row);
+            }
+            
+            var me = this;
+            this.getFromPoint = function (x, y, useOldGrid)
+            {
+                if (x < 0 || (x >= me.width && !this.wrap))
+                {
+                    if (!this.wrap)
+                    {
+                        return false;
+                    }
+                    x = me.width - Math.abs(x);
+                }
+                if (y < 0 || (y >= me.height && !this.wrap))
+                {
+                    if (!this.wrap)
+                    {
+                        return false;
+                    }
+                    y = me.height - Math.abs(y);
+                }
+                if (!useOldGrid)
+                {
+                    return me.grid[x % me.width][y % me.height];
+                }
+                else
+                {
+                    window.oldGrid = me.oldGrid;
+                    return me.oldGrid[x % me.width][y % me.height];
+                }
+            };
+            this.setAtPoint = function (x, y, to, useOldGrid)
+            {
+                if (x < 0)
+                {
+                    x = me.width - Math.abs(x);
+                }
+                if (y < 0)
+                {
+                    y = me.height - Math.abs(y);
+                }
+                x %= me.width;
+                y %= me.height;
+                if (to < 0)
+                {
+                    to = 0;
+                }
+                if (!useOldGrid)
+                {
+                    me.grid[x][y] = Math.min(to, this.maxColors - 1);
+                }
+                else
+                {
+                    me.oldGrid[x][y] = Math.min(to, this.maxColors - 1);
+                }
+            };
+            
+            this.copyGridToOldGrid = function ()
+            {
+                this.oldGrid = [];
+                for(var x=0; x<this.grid.length; x++)
+                {
+                    var row = [];
+                    for (var y = 0; y < this.grid[x].length; y++)
+                    {
+                        row.push(this.grid[x][y]);
+                    }
+                    this.oldGrid.push(row);
+                }
+            };
+            
+            this.draw = function (ctx, continueW)
+            {
+                ctx.strokeStyle = "red";
+                if (this.mustStop)
+                {
+                    this.mustStop = false;
+                    return;
+                }
+                var mycolor;
+                for (var x = 0; x < me.width*me.cellWidth; x += me.cellWidth)
+                {
+                    for (var y = 0; y < me.height*me.cellHeight; y += me.cellHeight)
+                    {
+                        mycolor = me.getFromPoint(x / me.cellWidth, y / me.cellHeight);
+                        if (mycolor === 0)
+                        {
+                            ctx.fillStyle = "black";
+                        }
+                        else if(mycolor === 1)
+                        {
+                            ctx.fillStyle = "white";
+                        }
+                        else if (mycolor === 2)
+                        {
+                            ctx.fillStyle = "green";
+                        }
+                        else
+                        {
+                            ctx.fillStyle = "rgba(" + Math.floor(Math.abs(Math.sin(mycolor)*255)) + "," + Math.floor(Math.abs(Math.cos(mycolor)*255)) + "," + Math.floor(Math.abs(Math.tan(mycolor)*255)) + ",1)";
+                        }
+                        ctx.fillRect(x, y, me.cellWidth, me.cellHeight);
+                        if (me.guides)
+                        {
+                            ctx.strokeRect(x, y, me.cellWidth, me.cellHeight);
+                        }
+                    }
+                }
+                if (continueW)
+                {
+                    me.animate();
+                    requestAnimationFrame(function () { me.draw(ctx, true); });
+                }
+            };
+            
+            this.stop = function ()
+            {
+                this.mustStop = true;
+            };
+            
+            this.animate = function ()
+            {
+                if (me.dontUpdateUntilEnd)
+                {
+                    me.copyGridToOldGrid();
+                }
+                var myPoint;
+                for (var x = 0; x < me.width; x ++)
+                {
+                    for (var y = 0; y < me.height; y ++)
+                    {
+                        myPoint = me.getFromPoint(x, y, me.dontUpdateUntilEnd);
+                        var neighbors = [];
+                        var allneighbors = [];
+                        var on = 0;
+                        var off = 0;
+                        var onAtAll = 0;
+                        for (var x2 = -1; x2 < 2; x2++)
+                        {
+                            for(var y2=-1; y2<2; y2++)
+                            {
+                                emptydir = [0,0];
+                                if(x2!==0 || y2!==0)
+                                {
+                                    if (x2 === 0 && y2 === 0)
+                                    {
+                                        continue;
+                                    }
+
+                                    var point = me.getFromPoint(x2 + x, y2 + y, me.dontUpdateUntilEnd);
+                                    allneighbors.push([x2 + x, y2 + y]);
+                                    if ((point >= myPoint && me.rules === 0) || (point && me.rules === 1))
+                                    {
+                                        on++;
+                                        neighbors.push([x2+x, y2+y]);
+                                        onAtAll++;
+                                    }
+                                    else
+                                    {
+                                        off++;
+                                        emptydir = [x2, y2];
+                                    }
+                                }
+                            }
+                        }
+                        if (this.rules === 0)
+                        {
+                            if (on === 3)
+                            {
+                                var neighborNumber = Math.floor(Math.random() * (neighbors.length));
+                                me.setAtPoint(neighbors[neighborNumber][0], neighbors[neighborNumber][1], me.getFromPoint(neighbors[neighborNumber][0], neighbors[neighborNumber][1]) - 1);
+                                me.setAtPoint(x, y, myPoint + 1);
+                            }
+                            else if (on === 7)
+                            {
+                                me.setAtPoint(x, y, me.getFromPoint(x - 1, y));
+                                me.setAtPoint(x - 1, y, myPoint);
+                            }
+                            else if (on !== 2 && myPoint !== 0)
+                            {
+                                if (neighbors.length === 0)
+                                {
+                                    var randx = Math.floor(Math.random() * 2 - 1);
+                                    var randy = Math.floor(Math.random() * 2 - 1);
+                                    while (randx === 0 && randy === 0)
+                                    {
+                                        randx = Math.floor(Math.random() * 2 - 1);
+                                        randy = Math.floor(Math.random() * 2 - 1);
+                                    }
+                                    me.setAtPoint(x + randx, y + randy, me.getFromPoint(x + randx, y + randy) + 1);
+                                    me.setAtPoint(x, y, myPoint - 1);
+                                }
+                                else
+                                {
+                                    var smallestNeighbor = 0;
+                                    var smallestNeighborValue=this.maxColors;
+                                    var curentVal=0;
+                                    for(var i=0; i<allneighbors.length; i++)
+                                    {
+                                        curentVal=me.getFromPoint(allneighbors[i][0], allneighbors[i][1]);
+                                        if(curentVal < smallestNeighborValue)
+                                        {
+                                            smallestNeighborValue = curentVal;
+                                            smallestNeighbor = i;
+                                        }
+                                    }
+
+                                    me.setAtPoint(allneighbors[smallestNeighbor][0], allneighbors[smallestNeighbor][1], myPoint);
+                                    me.setAtPoint(x, y, smallestNeighborValue);
+                                }
+                            }
+                        }
+
+                        else
+                        {
+                            if (on === 3)
+                            {
+                                me.setAtPoint(x, y, myPoint+1);
+                            }
+                            else if (on !== 2 && myPoint !== 0)
+                            {
+                                me.setAtPoint(x, y, myPoint-1);
+                            }
+                        }
+                    }
+                }
+            };
+            
+            this.takeInput = function (x, y, to, draw)
+            {
+                this.setAtPoint(Math.floor(x / this.cellWidth), Math.floor(y / this.cellHeight), to!==NaN&&to!==undefined?to:(this.getFromPoint(Math.floor(x / this.cellWidth), Math.floor(y / this.cellHeight))+1) % this.maxColors);
+                if (draw === true || draw === undefined)
+                {
+                    this.draw(this.ctx, false, false);
+                }
+            };
+        }
+        
+        function main()
+        {
+            var setToInput = document.getElementById("setTo");
+            var rulesInput = document.getElementById("rulesInput");
+            var maxColorsInput = document.getElementById("maxColor");
+            var canvas = document.getElementById("grid");
+            var grid = new Grid();
+            var ctx = canvas.getContext("2d");
+            canvas.width = grid.width * grid.cellWidth;
+            canvas.height = grid.height * grid.cellHeight;
+            grid.ctx = ctx;
+            
+            rulesInput.placeholder = "RULES";
+            maxColorsInput.placeholder = "MAX COLORS";
+            
+            rulesInput.oninput = function ()
+            {
+                var newRules = parseInt(this.value);
+                
+                if (!isNaN(newRules))
+                {
+                    grid.rules = newRules;
+                }
+            };
+            
+            document.getElementById("guidelines").onclick = function ()
+            {
+                grid.guides = this.checked;
+            };
+            
+            maxColorsInput.oninput = function ()
+            {
+                var newColors = parseInt(this.value);
+                
+                if (!isNaN(newColors))
+                {
+                    grid.maxColors = newColors;
+                }
+            };
+            
+            canvas.onclick = function (e) { e.preventDefault(); if (e.button === 2) { setToInput.value = "0"; } else if (e.shiftKey) { setToInput.value = "1"; } var bbox = canvas.getBoundingClientRect(); grid.takeInput(e.clientX - bbox.left, e.clientY - bbox.top, setToInput.value !== "" ? parseInt(setToInput.value) : undefined); };
+            var down = false;
+            canvas.onmousedown = function (e)
+            {
+                if (e.button === 2) { setToInput.value = "0"; } else if (e.shiftKey) { setToInput.value = "1"; }
+                e.preventDefault();
+                down = true;
+            };
+            
+            canvas.onmousemove = function (e) { if (down) { e.preventDefault(); var bbox = canvas.getBoundingClientRect(); grid.takeInput(e.clientX - bbox.left, e.clientY - bbox.top, setToInput.value !== ""?parseInt(setToInput.value):undefined, false); }};
+            canvas.onmouseup = function (e) { e.preventDefault(); down = false; grid.draw(grid.ctx, false); };
+            
+            animating = false;
+            document.body.onkeyup = function (e)
+            {
+                var animateNumber = 0;
+                if (e.keyCode === 27)
+                {
+                    if (!animating)
+                    {
+                        grid.draw(ctx, true);
+                        
+                        animating = true;
+                    }
+                }
+                else if (e.keyCode === 65)//a
+                {
+                    grid.stop();
+                    
+                    animating = false;
+                }
+                else if (e.shiftKey)
+                {
+                    if (e.keyCode === 49)
+                    {
+                        animateNumber = 10;
+                    }
+                    else if (e.keyCode === 50)
+                    {
+                        animateNumber = 100;
+                    }
+                    else if (e.keyCode === 51)
+                    {
+                        animateNumber = 1000;
+                    }
+                    else if (e.keyCode === 52)
+                    {
+                        animateNumber = 10000;
+                    } else if (e.keyCode === 53)
+                    {
+                        animateNumber = 20000;
+                    }//49=1, 50=2
+                }
+                if (animateNumber !== 0)
+                {
+                    for (var i = 0; i < animateNumber; i++)
+                    {
+                        grid.animate();
+                    }
+                }
+            };
+            
+            document.getElementById("simulateEscape").onclick = function()
+            {
+                if (!animating)
+                {
+                    grid.draw(ctx, true);
+                    
+                    animating = true;
+                }
+            };
+            
+            document.getElementById("simulateA").onclick = function()
+            {
+                grid.stop();
+                    
+                animating = false;
+            };
+            
+            document.getElementById("stepOnce").onclick = function()
+            {
+                grid.animate();
+                grid.draw(ctx, false);
+            };
+            
+            grid.draw(ctx, false);
+        }
+        main();
+    </script>
+</body>
+</html>

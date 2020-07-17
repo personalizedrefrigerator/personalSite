@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name = "viewport" content = "width=device-width,initial-scale=1.0"/>
+<title>Misc Tools</title>
+
+<script src = "Libs/SubWindowHelper.js"></script>
+<script src = "Libs/HTMLHelper.js"></script>
+<script src = "Libs/JSHelper.js"></script>
+</head>
+<body>
+<div id = "mainContent">
+
+</div>
+</body>
+
+<script>
+    function main()
+    {
+        var contentArea = document.getElementById("mainContent");
+        
+        HTMLHelper.addButton("Speech Synthesis", function()
+        {
+            var subWindow = document.createElement("div");
+        }, contentArea);
+    }
+    
+    main();
+</script>
+</html>

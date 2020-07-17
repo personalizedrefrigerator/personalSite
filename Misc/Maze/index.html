@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="user-scalable=no,width=device-width,initial-scale=1.0,min-zoom=1.0,max-zoom=1.0"/>
+	<meta name="apple-mobile-web-app-capable" content="yes"/>
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<link rel="apple-touch-icon" href="icon.png"/>
+	<link rel="apple-touch-startup-image" href = "./startupApple.png"/>
+	<link rel="icon" href="icon.png"/>
+	<title>Maze</title>
+
+	<!-- Includes -->
+	<script src = "main.js"></script>
+	<script src = "Vector.js"></script>
+	<script src = "WebGLHelper.js"></script>
+	<script src = "JSHelper.js"></script>
+	<script src = "HTMLHelper.js"></script>
+	<script src = "Objects.js"></script>
+	<script src = "MathHelper.js"></script>
+	<script src = "Matrix.js"></script>
+	<script src = "Maze.js"></script>
+	
+	<!-- Styles -->
+	<style>
+	*
+	{
+	    touch-action: none;
+	}
+	
+	.mainMenu
+	{
+	    margin-left: auto;
+	    margin-right: auto;
+	    max-width: 500px;
+	    
+	    padding: 10px;
+	    border: 1px solid gray;
+	    box-shadow: 5px 7px 3px rgba(0, 0, 0, 0.4);
+	    border-radius: 4px;
+	    
+	    background-image: radial-gradient(rgba(255, 0, 0, 0.5), white);
+	    background-size: 7px 7px;
+	}
+	
+	.mainMenu button
+	{
+	    width: 100%;
+	    margin-left: auto;
+	    margin-right: auto;
+	}
+	
+	h1
+	{
+	    text-align: center;
+	}
+	
+	body
+	{
+	    background-image: radial-gradient(white, #ddaa00);
+	    background-size: 10px 10px;
+	    background-color: black;
+	}
+	</style>
+</head>
+<body>
+    <script>
+        main();
+    </script>
+</body>
+</html>

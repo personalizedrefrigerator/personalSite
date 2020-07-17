@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- (c) 2018 -->
+<meta http-equiv="Cache-Control" content = "cache"/>
+<meta http-equiv="Pragma" content="cache"/>
+<meta name="viewport" content = "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=2.0"/>
+<link rel = "icon" href = "favicon.png"/>
+<title>Henry Heino</title>
+<style>
+@keyframes fadeIn
+{
+    0% { filter: opacity(0%) sepia(100%); }
+    100% { filter: opacity(100%) sepia(0%); }
+}
+
+.header
+{
+    border-bottom: 1px solid black;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+    background-color: rgba(255, 255, 255, 0.9);
+    position: fixed;
+    left:0;
+    top: 0;
+    right: 0;
+    
+    z-index: 9;
+    
+    animation: fadeIn 1s;
+}
+.title
+{
+    text-align: center;
+    display: block;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    right: 0;
+    
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    
+    font-size: 2em;
+}
+
+#content
+{
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 25px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+    transition: 1s ease box-shadow, max-width, margin-left, margin-right, border-radius, height, max-width;
+}
+
+.menuContainer
+{
+    
+}
+
+.smallImage > img
+{
+    width: 70%;
+}
+
+.contentWindow
+{
+    background-color: white;
+    position: fixed;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
+    filter: opacity(100%);
+    
+    background-image: radial-gradient(10deg, white, gray, white);
+    
+    transition: 0.5s ease filter;
+    
+    animation: fadeIn 0.1s linear;
+}
+
+.contentContainer
+{
+    background-color: rgba(200, 255, 255, 0.1);
+    background-image: linear-gradient(10deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.0));
+    box-shadow: -1px -1px 1px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+body
+{
+    background-image: radial-gradient(rgba(100, 100, 0, 0.4), rgba(255, 255, 255, 0.6));
+    background-color: rgba(255, 255, 255, 0.9);
+    background-size: 10px 10px;
+    overflow-x: hidden;
+    
+    transition: 1s ease background-color, background-size;
+}
+
+h1
+{
+    border-bottom: 1px solid gray;
+}
+
+.backgroundedHeader
+{
+    background-size: auto 14em;
+    background-repeat: no-repeat;
+    background-position-x: center;
+    
+    border: none;
+    border-radius: 8px;
+    filter: sepia(10%) contrast(100%);
+    
+    height: 7em;
+    
+    text-align: center;
+    padding-top: 6em;
+    
+    text-shadow: 2px 2px 1px rgba(255, 255, 255, 0.8);
+    
+    background-color: rgba(100, 100, 100, 0.1);
+    
+    transition: 1.6s ease all;
+}
+
+.backgroundedHeader:hover
+{
+    filter: sepia(70%) contrast(230%);
+    background-color: rgba(100, 100, 100, 1.0);
+}
+
+.contentDescription
+{
+    height: calc(100vh - 4em);
+    overflow-y: scroll;
+    overflow-x: hidden;
+    
+    font-size: 24pt;
+    
+    padding: 25px;
+    
+    position: fixed;
+    top:0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+}
+
+.contentDescription h1
+{
+    text-align: center;
+    font-size: 30pt;
+}
+
+button, .menu
+{
+    border: 1px solid gray;
+    background-color: rgba(10, 100, 200, 0.8);
+    background-image: linear-gradient(25deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.8), rgba(0, 0, 255, 0.1));
+    color: white;
+    background-size: 100% 100%;
+    transform: matrix(1, 0, 0, 1, 0, 0);
+    padding: 10px;
+    box-shadow: -2px -2px 3px rgba(0, 0, 0, 0.4);
+    transition: 0.5s ease all;
+}
+
+button:hover, .menu:hover
+{
+    background-size: 200% 200%;
+    transform: matrix(1, 0.01, 0, 1, 0, 0);
+    background-color: rgba(100, 100, 100, 0.5);
+}
+
+.imageDescription
+{
+    color: gray;
+    text-indent: 5px;
+}
+
+.largeSubmitButton
+{
+    font-size: 4em;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    display: block;
+    text-align: center;
+    width: 100vw;
+    height: 1.5em;
+    padding: 0px;
+    z-index: 2;
+}
+
+.growable
+{
+    transform: scale(1, 1);
+    filter: opacity(100%);
+    transition: 1s ease all;
+}
+
+.growable:hover
+{
+    transform: scale(2.5, 2.5);
+    filter: opacity(95%);
+}
+
+.largeSubmitButton:hover
+{
+    transform: matrix(1, 0, 0.02, 1.02, 0, 0);
+}
+
+.projectsArticle h2
+{
+    display: inline;
+}
+
+p
+{
+    text-indent: 30px;
+}
+
+a
+{
+    color: green;
+    text-decoration: underline;
+}
+
+.subtleLink
+{
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.subtleLink:visited
+{
+    font-weight: none;
+    text-decoration: none;
+    color: black;
+}
+
+a:visited
+{
+    color: green;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+*
+{
+    font-family: 'Times New Roman';
+}
+
+@media screen and (max-width: 800px)
+{
+    #content
+    {
+        max-width: 800px;
+        border-radius: 0px;
+    }
+    
+    .header
+    {
+        position: absolute;
+    }
+    
+    body
+    {
+        padding: 0px;
+        margin: 0px;
+        background-color: rgba(200, 200, 0, 0.8);
+        background-size: 5px 5px;
+    }
+}
+
+@media print
+{
+    body
+    {
+        background-image: none;
+        background-color: white;
+        color: black;
+    }
+    
+    .header
+    {
+        display: none;
+    }
+    
+    #content
+    {
+        max-width: none;
+        margin-left: 0px;
+        box-shadow: none;
+        border: 0px solid white;
+    }
+}
+</style>
+</head>
+<body>
+<div class = "header">
+<span class = "title">Henry Heino</span>
+<div class = "menuContainer" id = "pageList"></div>
+</div>
+<div id = "content">
+<div class = "pageArticle" name = "Experience">
+<h1 class = "backgroundToLoad backgroundedHeader">
+<a>2018-11-01-015549.jpg</a> Experience</h1>
+<h2>Robotics</h2>
+<div style = "float: right; width: 30%;">
+<div class = "imageToLoad smallImage growable" style = "width: 100%;">2018-11-01-015549.jpg</div>
+<div class = "imageDescription">
+A pair of &ldquo;kangaroo ears&rdquo; produced by the Lake Washington High School Robotics team. The mascot of the team is a purple kangaroo.
+</div>
+</div>
+<p>Since mid-2017, Henry has been a member of the Lake Washington High School Robotics team. Aside from learning to use tools such as &ldquo;git,&rdquo; this amazing experience has helped members of the team to work together, managing both communications with other programmers, but other teams developing different sections of the robot.</p>
+<p>In 2018, Henry was one of two 2018 &ldquo;Dean's List&rdquo; nominees from this robotics team. </p>
+<p>At the beginning of the 2018 school year, Henry created a website to help manage the vision team at <a href = "https://lwrobotvis.firebaseapp.com/">lwrobotvis.firebaseapp.com</a>.</p>
+<h2>Martial Arts</h2>
+<p>Henry has been involved in martial arts since 2008, in Kirkland Washington. In 2017, he was hired -- becoming a staff member. He instructs, cleans, and assists students.</p>
+
+
+
+<div style = "float: right; width: 30%;">
+<div class = "imageToLoad smallImage growable" style = "width: 100%;">rayTracer.png</div>
+<div class = "imageDescription">
+A screenshot of the ray-tracing program running in a virtual Android device.
+</div>
+</div>
+
+<h2>Programming Languages</h2>
+<p>Henry is able to familiar with JavaScript, C++, Python, and Java. His most recent projects have been focused around JavaScript and C++, but has used Java to crate Android applications. None of his applications are published, but include a 3-dimensional graphing utility and a ray-tracing program.</p>
+
+</div>
+<div class = "pageArticle projectsArticle" name = "Projects">
+<h1 class = "backgroundToLoad backgroundedHeader">
+<a>Screenshot from 2018-08-24 17-31-59.png</a>Recent Projects</h1>
+<hr/>
+
+<div>
+<h2>A Shareable Game Project</h2>
+<a href = "https://share-dgame.firebaseapp.com/">Visit</a>
+
+<p>Using Google Firebase for hosting and communication between devices, this project allowed players to join a game from afar. Henry was able to apply my recent research into WebGL to create a simulated room, in which players can see rectangular prisms representing other online players. The <a href = "https://share-dgame.firebaseapp.com/description.html">game-description</a> page used WebGL to render its background.</p>
+
+<div style = "float: right; width: 30%;">
+<div class = "imageToLoad smallImage growable" style = "width: 100%;">sharableGameBackground.png</div>
+<div class = "imageDescription">
+A view of the Shareable Game Project.
+</div>
+</div>
+
+</div>
+<hr/>
+
+<h2>WebGL Projects</h2>
+<a href = "WebGL/index.html">View</a>
+<p>Over the summer, Henry created several projects involving WebGL -- a method of creating programs that compile to run on a graphics processing unit, launched and used in a web-browser.</p>
+
+<hr/>
+
+<h2>Neural Networks</h2>
+<div style = "float: right; width: 30%;">
+<div class = "imageToLoad smallImage growable" style = "width: 100%;">Screenshot from 2018-10-06 16-11-24.png</div>
+<div class = "imageDescription">
+A random dot stereogram. With proper eye-focus, dots are interpreted differently by each eye, displaying an apparent 3D image.
+</div>
+</div>
+<a href = "learningtest12.firebaseapp.com">Visit</a>
+<p>While reading <a href="http://neuralnetworksanddeeplearning.com/" class = "subtleLink"><i>Neural Networks and Deep Learning,</i></a> by Michael Nielsen, Henry created neural-network training programs in both JavaScript and C++. The JavaScript version, created first, has been used to train a network to recognize computer-generated symbols with an accuracy of over 30%. This section of the project can be seen on <a href = "https://learningtest12.firebaseapp.com/textRecognition.html">this website.</a></p>
+
+
+<hr/>
+<div>
+<h2>Random Dot Stereogram Generator</h2>
+<a href = "WebGL/stereogramProgram.html">Visit</a>
+<p>A program created at the beginning of the 2018 - 2019 school year, simulating three dimensions.</p>
+</div>
+</div>
+<div class = "pageArticle" name = "Contact">
+<h1>Contact Information</h1>
+<div><b>Email: </b>henryuheino@gmail.com</div>
+<p>Henry can be contacted through email. This contact information may be used to request clarification about parts of this web-site.</p>
+<div style = "text-align: center;">Thank you for the time spent reviewing this website.</div>
+<p>
+</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/5.5.4/firebase.js"></script>
+
+<script>
+    var progress = 0;
+    try
+    {
+      // Initialize Firebase
+      var config = 
+      {
+        apiKey: "AIzaSyA-6ZNhrT2Qo3tzLMS_expYIR5EdqAGUXI",
+        authDomain: "henry-heino.firebaseapp.com",
+        databaseURL: "https://henry-heino.firebaseio.com",
+        projectId: "henry-heino",
+        storageBucket: "henry-heino.appspot.com",
+        messagingSenderId: "303871404797"
+      };
+
+      firebase.initializeApp(config);
+      
+      progress = 1;
+      
+      window.database = firebase.database();
+      
+      progress = 2;
+      
+      window.pages = database.ref("pages");
+      window.users = database.ref("users");
+      window.menus = database.ref("menus");
+      window.surveys = database.ref("surveys");
+      
+      progress = 3;
+      
+      window.authorization = firebase.auth();
+      window.storage=firebase.storage();
+      window.storageRef=storage.ref();
+  }
+  catch(e)
+  {
+    window.firebaseError = e + ". Help: window.firebase: " + window.firebase + ", ";
+    window.firebaseError += "Pages: " + window.pages + ". Progress: " + progress + ".";
+  }
+</script>
+
+
+<script>
+function showError(error, location)
+{
+    console.error(error);
+}
+
+function closablePopup(content, submitContent, animateBackgroundCtx, onComplete)
+{
+    var contentWindow = document.createElement("div");
+    var submitButton = document.createElement("button");
+    var backgroundCanvas = document.createElement("canvas");
+    var ctx = backgroundCanvas.getContext("2d");
+    
+    backgroundCanvas.style.width = "100%";
+    backgroundCanvas.style.height = "100%";
+    backgroundCanvas.style.position = "absolute";
+    backgroundCanvas.style.top = 0;
+    backgroundCanvas.style.left = 0;
+    backgroundCanvas.style.zIndex = 0;
+    
+    var animationRunning = true;
+    var state = {};
+    
+    var animate = function()
+    {
+        if(animationRunning && animateBackgroundCtx)
+        {
+            if(backgroundCanvas.width !== backgroundCanvas.clientWidth || backgroundCanvas.height !== backgroundCanvas.height)
+            {
+                backgroundCanvas.width = backgroundCanvas.clientWidth;
+                backgroundCanvas.height = backgroundCanvas.clientHeight;
+            }
+        
+            animateBackgroundCtx(ctx, state);
+            
+            requestAnimationFrame(animate);
+        }
+    };
+    
+    animate();
+    
+    submitButton.innerHTML = submitContent;
+    
+    var contentDescription = document.createElement("div");
+    contentDescription.innerHTML = content;
+    
+    contentDescription.setAttribute("class", "contentDescription");
+    contentWindow.setAttribute("class", "contentWindow");
+    submitButton.setAttribute("class", "largeSubmitButton");
+    submitButton.style.float = "right";
+    
+    contentWindow.appendChild(contentDescription);
+    contentWindow.appendChild(backgroundCanvas);
+    contentWindow.appendChild(submitButton);
+    
+    loadImages(contentWindow);
+    
+    document.body.appendChild(contentWindow);
+    
+    submitButton.addEventListener("click", function() 
+    {
+        animationRunning = false;
+        
+        if(onComplete)
+        {
+            onComplete();
+        }
+        
+        contentWindow.style.filter = "opacity(0%)";
+        
+        setTimeout(function()
+        {
+            contentWindow.outerHTML = "";
+        }, 500);
+    }, false);
+}
+
+function loadImages(element)
+{
+    var imagesToLoad = document.getElementsByClassName("imageToLoad");
+    var backgroundsToLoad = document.getElementsByClassName("backgroundToLoad");
+    
+    var load = function(element, asBackground)
+    {
+        if(element.getAttribute("name") === "loadedImage")
+        {
+            return;
+        }
+        
+        var src = element.innerHTML;
+        
+        if(element.children.length > 0 && asBackground)
+        {
+            src = element.children[0].innerHTML;
+            element.children[0].style.display = "none";
+        }
+        else
+        {
+            element.innerHTML = "";
+        }
+        
+        element.setAttribute("name", "loadedImage");
+        
+        var currentImage;
+        
+        if(!asBackground)
+        {
+            currentImage = new Image();
+        }
+        
+        storageRef.child(src).getDownloadURL().then(function(url)
+        {
+            if(!asBackground)
+            {
+                currentImage.src = url;
+                element.appendChild(currentImage);
+            }
+            else
+            {
+                element.style.backgroundImage = "url('" + url + "')";
+            }
+        }).catch(function(error)
+        {
+            showError(error, "loadImages");
+        });
+    };
+    
+    for(var i = 0; i < imagesToLoad.length; i++)
+    {
+        load(imagesToLoad[i]);
+    }
+    
+    for(var i = 0; i < backgroundsToLoad.length; i++)
+    {
+        load(backgroundsToLoad[i], true);
+    }
+}
+
+function loadPages(pagesListContainer)
+{
+    var pagesList = document.getElementsByClassName("pageArticle");
+    
+    var previousShownPage = {};
+    
+    var handlePage = function(pageElement)
+    {
+        var goToPage = document.createElement("button");
+        goToPage.innerHTML = pageElement.getAttribute("name");
+        
+        pagesListContainer.appendChild(goToPage);
+        
+        if(!previousShownPage.defined)
+        {
+            previousShownPage = {pageElement: pageElement, goToPage: goToPage, defined: true};
+            goToPage.style.backgroundColor = "rgba(0, 255, 0, 0.7)";
+        }
+        
+        goToPage.onclick = function()
+        {
+            goToPage.style.backgroundColor = "rgba(0, 255, 0, 0.7)";
+            
+            var opacity = 1;
+            var lastTime = (new Date()).getTime();
+            
+            var animateOpacity = function()
+            {
+                var nowTime = (new Date()).getTime();
+                if(opacity < 0.01)
+                {
+                    previousShownPage.pageElement.style.display = "none";
+                    previousShownPage.pageElement.style.filter = "";
+                    previousShownPage.goToPage.style.backgroundColor = "";
+                    
+                    pageElement.style.display = "block";
+                    pageElement.style.animation = "fadeIn 1.0s";
+                    pageElement.style.animationPlayState = "running";
+                    
+                    previousShownPage = {pageElement: pageElement, goToPage: goToPage};
+                }
+                else
+                {
+                    previousShownPage.pageElement.style.filter = "opacity(" + Math.floor(opacity * 100) + "%)";
+                    opacity -= 0.005 * (nowTime - lastTime);
+                    
+                    
+                    lastTime = nowTime;
+                    
+                    requestAnimationFrame(animateOpacity);
+                }
+            };
+            
+            animateOpacity();
+        };
+    };
+    
+    for(var i = 0; i < pagesList.length; i++)
+    {
+        if(i > 0)
+        {
+            pagesList[i].style.display = "none";
+        }
+        
+        handlePage(pagesList[i]);
+    }
+}
+
+function main()
+{
+    var html = document.body.innerHTML;
+    document.body.style.overflow = "hidden";
+    closablePopup(`<h1 class="backgroundedHeader">Henry Heino</h1>
+                <div class = "contentContainer">
+                <p>A growing computer-programmer looking for a software-development internship at Microsoft, seeking to learn how to create long-lasting and well-designed programs by working with software developed by experienced professionals.</p>
+                <p>Henry Heino is a soon-to-graduate high-school student, hoping to increase his knowledge of programming.</p>
+                <p>He will bring his expierence creating software for his high-school's robotics team where he used C++ to create a game-object recognition program. His experience working with young students will help him work well with and understand co-workers.</p>
+                </div>`, "Continue", function(ctx, state)
+    {
+        if(!state.lastLetterIndex)
+        {
+            state.lastLetterIndex = 0;
+            state.lastX = 0;
+            state.lastY = 0;
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        }
+        
+        ctx.save();
+        
+        if(Math.random() < 0.5)
+        {
+            ctx.fillStyle = "rgba(100, 100, 255, 0.01)";
+            ctx.beginPath();
+            ctx.arc(Math.random() * ctx.canvas.width, Math.random() * ctx.canvas.height, Math.random() * Math.min(ctx.canvas.width, ctx.canvas.height) / 2, 0, Math.PI * 2, true);
+            ctx.fill();
+        }
+        
+        ctx.fillStyle = "rgba(0, 200, 100, 0.2)";
+        ctx.font = Math.ceil(3 * Math.random() + 6) * 3 + "pt Serif";
+        
+        var usedLetter;
+        
+        var maxLetters = 120 * Math.random() / (state.lastLetterIndex / 30 + 1);
+        
+        if(maxLetters < 1)
+        {
+            if(Math.random() > 1 / (state.lastLetterIndex / 10 + 1) + 0.3)
+            {
+                return;
+            }
+        }
+        
+        for(var i = 0; i < maxLetters; i++)
+        {
+        
+            usedLetter = html[state.lastLetterIndex];
+            
+            ctx.fillText(usedLetter, state.lastX, state.lastY);
+            
+            state.lastLetterIndex++;
+            if(usedLetter !== "\n")
+            {
+                state.lastX += ctx.measureText(usedLetter).width;
+            }
+            else
+            {
+                state.lastX = 0;
+                state.lastY += ctx.measureText("W.").width;
+            }
+            
+            if(state.lastX >= ctx.canvas.width)
+            {
+                state.lastX = 0;
+                state.lastY += ctx.measureText("W").width;
+            }
+            
+            if(state.lastLetterIndex >= html.length || state.lastY >= ctx.canvas.height)
+            {
+                if(state.lastLetterIndex >= html.length)
+                {
+                    state.lastLetterIndex = 0;
+                }
+                
+                state.lastX = 0;
+                state.lastY = 0;
+                
+                state.clearCount = 0;
+            }
+        }
+        
+        if(state.clearCount < 50)
+        {
+            ctx.save();
+            ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+            ctx.fillRect(0, 0, ctx.canvas.width * Math.random(), ctx.canvas.height);
+            ctx.restore();
+            
+            state.clearCount++;
+        }
+        
+        ctx.restore();
+    }, function()
+    {
+        document.body.style.overflow = "auto";
+    });
+    
+    loadPages(document.getElementById("pageList"));
+    loadImages(document.body);
+}
+
+main();
+</script>
+
+</body>
+</html>

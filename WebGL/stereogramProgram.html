@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>WebGL 9...</title>
+<script src = "Vector.js"></script>
+<script src = "Matrix.js"></script>
+<script src = "Objects.js"></script>
+
+<meta name="viewport" content="width=device-width, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
+
+<style>
+.displayCanvas
+{
+    width: 100vw;
+    height: 100vh;
+    
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.errorContainer
+{
+    border: 2px outset red;
+    border-radius: 15px;
+    
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.4);
+    filter: opacity(90%) sepia(75%);
+    
+    background-color: rgba(200, 200, 100, 0.3);
+    background-image: linear-gradient(35deg, rgba(255, 255, 255, 0.9), rgba(0, 0, 0, 0.1));
+    
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+    padding: 4px;
+}
+
+body
+{
+    background-image: radial-gradient(rgba(255, 255, 0, 0.8), white);
+    background-size: 5px 5px;
+}
+</style>
+</head>
+<body>
+
+<script>
+var canvas2D = document.createElement("canvas");
+var ctx = canvas2D.getContext("2d");
+
+canvas2D.setAttribute("class", "displayCanvas");
+
+var distances = [];
+var mu = 1/3;
+var eyeSpacing = 2.5 * 85;
+
+function separation(zValue)
+{
+    return eyeSpacing * (1 - mu * zValue) / (2 - mu * zValue);
+}
+
+var sameColor = [];
+var rowData = [];
+    
+var drawingSize = 30;
+var drawing = true;
+var drawingHeight = 0.25;
+var drawingMode = 1;
+var useTime = true;
+var showRed = true,
+    showGreen = true,
+    showBlue = true;
+var reDistanceNeeded = true;
+var translateX = 0,
+    translateY = 0,
+    zoom = 1;
+var lastMouseX, lastMouseY;
+    
+document.body.onmousemove = function(e)
+{
+    var x;
+    var y;
+    
+    var startX = e.clientX;
+    var startY = e.clientY;
+    var boxSize = canvas2D.width / drawingSize;
+    
+    for(x = startX; x < startX + boxSize; x++)
+    {
+        for(y = startY; y < startY + boxSize; y++)
+        {
+            if(y < distances.length && x < distances[0].length)
+            {
+                if(drawing)
+                {
+                    if(drawingMode === 1)
+                    {
+                        distances[y][x] *= 9 / 10;
+                    }
+                    else
+                    {
+                        distances[y][x] = drawingHeight;
+                    }
+                }
+            }
+        }
+    }
+
+    lastMouseX = startX;
+    lastMouseY = startY;
+};
+
+document.body.onclick = function(e)
+{
+    var x;
+    var y;
+    
+    var startX = e.clientX;
+    var startY = e.clientY;
+    var boxSize = canvas2D.width / drawingSize;
+    
+    for(x = startX; x < startX + boxSize; x++)
+    {
+        for(y = startY; y < startY + boxSize; y++)
+        {
+            if(y < distances.length && x < distances[0].length)
+            {
+                distances[y][x] += 0.05;
+                
+                if(distances[y][x] > 1)
+                {
+                    distances[y][x] = 1;
+                }
+            }
+        }
+    }
+};
+
+
+var lastTouchX = 0;
+var lastTouchY = 0;
+var lastDistance = 0;
+document.body.addEventListener("touchstart", function(e)
+{
+    var firstTouch = e.changedTouches[0];
+    
+    lastTouchX = firstTouch.clientX;
+    lastTouchY = firstTouch.clientY;
+    
+    if (e.changedTouches.length > 1)
+    {
+        var secondTouch = e.changedTouches[1];
+        lastDistance = Math.sqrt(Math.pow(firstTouch.clientX - secondTouch.clientX, 2) + Math.pow(firstTouch.clientY - secondTouch.clientY, 2));
+    }
+    
+    e.preventDefault();
+}, true);
+
+document.body.addEventListener("touchmove", function(e)
+{
+    var firstTouch = e.changedTouches[0];
+    
+    
+    if(e.changedTouches.length === 1)
+    {
+        translateX -= (firstTouch.clientX - lastTouchX) / window.innerWidth;
+        translateY -= (firstTouch.clientY - lastTouchY) / window.innerHeight;
+    }
+    else if (e.changedTouches.length > 1)
+    {
+        var secondTouch = e.changedTouches[1];
+        var distance = Math.sqrt(Math.pow(firstTouch.clientX - secondTouch.clientX, 2) + Math.pow(firstTouch.clientY - secondTouch.clientY, 2));
+        zoom += (distance - lastDistance) / 1000;
+        
+        lastDistance = distance;
+    }
+    
+    lastTouchX = firstTouch.clientX;
+    lastTouchY = firstTouch.clientY;
+    reDistanceNeeded = true;
+    
+    
+    e.preventDefault();
+}, true);
+
+document.body.addEventListener("touchend", function(e)
+{
+    var firstTouch = e.changedTouches[0];
+    
+    lastTouchX = firstTouch.clientX;
+    lastTouchY = firstTouch.clientY;
+    
+    e.preventDefault();
+}, true);
+
+document.body.style.touchAction = "none";
+
+document.body.onkeypress = function(e)
+{
+    var key = e.key;
+    
+    var deltaView = zoom / 20;
+    
+    if(key === "1")
+    {
+        drawingSize *= 1.1;
+    }
+    else if (key === "2")
+    {
+        drawingSize /= 1.1;
+    }
+    else if (key === "`")
+    {
+        drawing = !drawing;
+    }
+    else if (key === "=")
+    {
+        for(var y = 0; y < distances.length; y++)
+        {
+            for(var x = 0; x < distances[y].length; x++)
+            {
+                distances[y][x] = 1;
+            }
+        }
+    }
+    else if (key === "3")
+    {
+        useTime = !useTime;
+    }
+    else if (key === "f")
+    {
+        drawingMode ++;
+        
+        if(drawingMode > 2)
+        {
+            drawingMode = 1;
+        }
+    }
+    else if(key === "j")
+    {
+        drawingHeight += 0.05;
+        
+        if(drawingHeight > 1.2)
+        {
+            drawingHeight = 1.2;
+        }
+    }
+    else if(key === "n")
+    {
+        drawingHeight -= 0.05;
+        
+        if(drawingHeight < -0.2)
+        {
+            drawingHeight = -0.2;
+        }
+    }
+    else if(key === "t")
+    {
+        showRed = !showRed;
+    }
+    else if(key === "y")
+    {
+        showGreen = !showGreen;
+    }
+    else if(key === "u")
+    {
+        showBlue = !showBlue;
+    }
+    else if(key === "w")
+    {
+        translateY -= deltaView;
+        reDistanceNeeded = true;
+    }
+    else if(key === "s")
+    {
+        translateY += deltaView;
+        reDistanceNeeded = true;
+    }
+    else if(key === "a")
+    {
+        translateX -= deltaView;
+        reDistanceNeeded = true;
+    }
+    else if(key === "d")
+    {
+        translateX += deltaView;
+        reDistanceNeeded = true;
+    }
+    else if(key === "q")
+    {
+        zoom -= deltaView;
+        reDistanceNeeded = true;
+    }
+    else if(key === "e")
+    {
+        zoom += deltaView;
+        reDistanceNeeded = true;
+    }
+    else if(key === "z")
+    {
+        var text = prompt("Text to insert?", "");
+
+        ctx.font = "bold 120pt Sans";
+
+        var temporaryCanvas = document.createElement("canvas");
+        temporaryCanvas.width = ctx.measureText(text).width;
+        temporaryCanvas.height = ctx.measureText("W").width * 1.5;
+
+        var tempCtx = temporaryCanvas.getContext("2d");
+
+        tempCtx.font = "bold 120pt Sans";
+        
+        tempCtx.fillStyle = "orange";
+        tempCtx.textBaseline = "middle";
+        tempCtx.textAlign = "left";
+        
+        tempCtx.fillText(text, 0, tempCtx.canvas.height / 2);
+
+        requestAnimationFrame(function()
+        {
+            var data = tempCtx.getImageData(0, 0, tempCtx.canvas.width, tempCtx.canvas.height).data;
+
+            console.log(data.length);
+
+            var x, y;
+            for(var i = 0; i < data.length; i += 4)
+            {
+                x = Math.floor(lastMouseX + ((i / 4) % tempCtx.canvas.width));
+                y = lastMouseY + Math.floor((i / 4 / tempCtx.canvas.width));
+
+                if(x > distances[0].length || y > distances.length)
+                {
+                    continue;
+                }
+
+                if(data[i] >= 0.5)
+                {
+                    if(drawingMode === 1)
+                    {
+                        distances[y][x] += 0.1;
+                    }
+                    else
+                    {
+                        distances[y][x] = drawingHeight;
+                    }
+                }
+            }
+        });
+    }
+};
+
+function animate()
+{
+    if(canvas2D.width !== canvas2D.clientWidth || canvas2D.height !== canvas2D.clientHeight)
+    {
+        canvas2D.width = canvas2D.clientWidth;
+        canvas2D.height = canvas2D.clientHeight;
+        
+        sameColor = [];
+        rowData = [];
+        
+        reDistanceNeeded = true;
+        
+        for(x = 0; x < canvas2D.width; x ++)
+        {
+            sameColor.push(x);
+            rowData.push(256);
+        }
+    }
+    
+    if(reDistanceNeeded)
+    {
+        distances = [];
+        var row = [];
+        
+        var pictureX, pictureY;
+        var value;
+        
+        for(var y = 0; y < canvas2D.height; y++)
+        {
+            row = [];
+            for(var x = 0; x < canvas2D.width; x++)
+            {
+                pictureX = ((x - canvas2D.width / 2) / canvas2D.width * zoom + translateX);
+                pictureY = ((y - canvas2D.height / 2) / canvas2D.height * zoom + translateY);
+                
+                value = 1 / zoom * (Math.abs((Math.cos((pictureX + pictureY) * Math.PI * 8) + 1) * Math.sin(pictureX/8 - pictureY/16) + Math.sin(pictureX * pictureY * 100) / 10 + Math.sin(Math.cos(pictureX * pictureY * 100) / 3) / 10));
+                
+                if(value > 1.2)
+                {
+                    value = 1.2;
+                }
+                
+                if(value < -0.1)
+                {
+                    value = -0.15;
+                }
+                
+                row.push(value);
+            }
+            
+            distances.push(row);
+        }
+        
+        reDistanceNeeded = false;
+    }
+    
+    if(canvas2D.width === 0 || canvas2D.height === 0)
+    {
+        console.warn("Size is zero!");
+        requestAnimationFrame(animate);
+        return;
+    }
+    
+    var x, toOtherDot, left, right;
+    
+    var data = ctx.getImageData(0, 0, canvas2D.width, canvas2D.height);
+    
+    var time = new Date().getTime();
+    
+    var dat = data.data;
+    
+    for(var y = 0; y < canvas2D.height; y ++)
+    {
+        for(x = 0; x < canvas2D.width; x ++)
+        {
+            sameColor[x] = x;
+        }
+        
+        for(x = 0; x < canvas2D.width; x++)
+        {
+            toOtherDot = separation(distances[y][x]);
+            
+            // FInd the locations of the left and right pixels.
+            left = x - toOtherDot;
+            right = x + toOtherDot;
+            
+            left = Math.round(left);
+            right = Math.round(right);
+            
+            // If on the screen,
+            if(0 <= left && canvas2D.width >= right)
+            {
+                var zCheck;
+                var xCheck = 1;
+                var visible = true;
+                
+                do
+                {
+                    zCheck = toOtherDot + (2 * xCheck) / (mu * eyeSpacing) * (2 - mu * toOtherDot);
+                    visible = zCheck >= distances[y][x + xCheck] && zCheck >= distances[y][x - xCheck];
+                    xCheck++;
+                }
+                while(visible && zCheck <= 1 && x + xCheck < canvas2D.width && x - xCheck >= 0);
+                
+                if(visible)
+                {
+                    var currentTo = sameColor[left];
+                    var lastCurrentTo = left;
+                    
+                    var currentRight = right;
+                    
+                    // Danger! This has a potential to cause infinite loops!
+                    while(currentTo !== lastCurrentTo && currentTo !== currentRight)
+                    {
+                        lastCurrentTo = currentTo;
+                        currentTo = sameColor[currentTo];
+                        
+                        if(currentTo > currentRight)
+                        {
+                            var newCurrentRight = currentTo;
+                            currentTo = currentRight;
+                            currentRight = newCurrentRight;
+                        }
+                    }
+                    
+                    sameColor[currentTo] = currentRight;
+                }
+            }
+        }
+        
+        for(x = canvas2D.width - 1; x >= 0; x--)
+        {
+            if(sameColor[x] === x)
+            {
+                rowData[x] = (0.5 * (Math.sin(x * x / (y + 1) * 100 + (useTime?(x * time / 500):0)) * Math.cos(x + y) + 1)) * 256;
+            }
+            else
+            {
+                rowData[x] = rowData[sameColor[x]];
+            }
+            
+            var color = rowData[x];
+            if(showRed)
+            {
+                dat[x * 4 + y * 4 * canvas2D.width] = color;
+            }
+            else
+            {
+                dat[x * 4 + y * 4 * canvas2D.width] *= 2/3;
+            }
+            
+            if(showGreen)
+            {
+                dat[x * 4 + y * 4 * canvas2D.width + 1] = color;
+            }
+            else
+            {
+                dat[x * 4 + y * 4 * canvas2D.width + 1] *= 2/3;
+            }
+            
+            if(showBlue)
+            {
+                dat[x * 4 + y * 4 * canvas2D.width + 2] = color;
+            }
+            else
+            {
+                dat[x * 4 + y * 4 * canvas2D.width + 2] *= 2/3;
+            }
+            
+            dat[x * 4 + y * 4 * canvas2D.width + 3] = 256;
+        }
+    }
+    
+    ctx.putImageData(data, 0, 0);
+    
+    
+    requestAnimationFrame(animate);
+}
+
+document.body.appendChild(canvas2D);
+
+animate();
+</script>
+</body>
+</html>

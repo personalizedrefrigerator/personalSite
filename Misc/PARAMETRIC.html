@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>PARAMETRIC (with t)</title>
+</head>
+<body>
+<script>
+
+
+function showGraph(ctx, xEquation, yEquation, scale, minT, maxT, deltaT)
+{
+	if(ctx.canvas.clientWidth != ctx.canvas.width || ctx.canvas.clientHeight != ctx.canvas.height)
+	{
+		ctx.canvas.width = ctx.canvas.clientWidth;
+		ctx.canvas.height = ctx.canvas.clientHeight;
+	}
+
+	ctx.lineWidth = 2;
+
+	deltaT = deltaT !== undefined && deltaT !== 0.0 && deltaT !== 0 ? deltaT : 0.1;
+
+	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+	ctx.strokeStyle = "#ff0000";
+	ctx.beginPath();
+	ctx.moveTo(0, ctx.canvas.height / 2);
+	ctx.lineTo(ctx.canvas.width, ctx.canvas.height / 2);
+	ctx.stroke();
+
+	ctx.beginPath();
+	ctx.moveTo(ctx.canvas.width / 2, 0);
+	ctx.lineTo(ctx.canvas.width / 2, ctx.canvas.height);
+	ctx.stroke();
+
+        ctx.beginPath();
+
+        var x, y;
+	for(var t = deltaT > 0 ? minT : maxT; ((t < maxT && deltaT > 0) || (t > minT && deltaT < 0)); t += deltaT)
+	{
+		x = xEquation(t),
+			y = yEquation(t);
+
+		x *= scale;
+		y *= scale;
+
+		x += ctx.canvas.width / 2;
+		y = ctx.canvas.height / 2 - y;
+                
+		ctx.lineTo(x, y);
+		ctx.strokeStyle = "rgba(" + Math.floor(Math.abs(Math.cos(t * Math.PI * 2)*255)) + ", " + Math.floor(Math.abs(Math.cos(t / 10)*200)) + ", " + Math.floor(Math.abs(Math.cos(t / 100)*100)) + ", 1)";
+		ctx.stroke();
+
+		ctx.beginPath();
+
+		ctx.moveTo(x, y);
+	}
+
+	ctx.strokeStyle = "black";
+	ctx.stroke();
+}
+
+function main()
+{
+	var zoom = 4, ctx;
+	function go()
+	{
+		var minT = eval(minTInput.value),
+			maxT = eval(maxTInput.value),
+			dt = eval(dtInput.value),
+			xEquation = eval("(function(t) { return (" + xEquationInput.value + "); })"),
+			yEquation = eval("(function(t) { return (" + yEquationInput.value + "); })");
+
+		zoom = zoom || 1;
+
+		zoomInput.value = zoom;
+
+		showGraph(ctx, xEquation, yEquation, zoom, minT, maxT, dt);
+	}
+
+	var canvas = document.createElement("canvas");
+	canvas.style.width = "100vw";
+	canvas.style.height = "100vh";
+	canvas.style.position = "absolute";
+	canvas.style.top = 0;
+	canvas.style.left = 0;
+
+	var inputContainer = document.createElement("div");
+	inputContainer.style.border = "1px solid red";
+	inputContainer.style.borderRadius = "2px";
+	inputContainer.style.position = "absolute";
+	inputContainer.style.zIndex = 3;
+	inputContainer.style.top = 0;
+	inputContainer.style.left = 0;
+	inputContainer.style.boxShadow = "1px 2px 3px rgba(0, 0, 0, 0.5)";
+
+	var xEquationInput = document.createElement("input");
+	var yEquationInput = document.createElement("input");
+	var dtInput = document.createElement("input");
+	var minTInput = document.createElement("input");
+	var maxTInput = document.createElement("input");
+	var zoomInput = document.createElement("input");
+
+	xEquationInput.placeholder = "x";
+	yEquationInput.placeholder = "y";
+	dtInput.placeholder = "dt";
+	minTInput.placeholder = "minT";
+	maxTInput.placeholder = "maxT";
+	zoomInput.placeholder = "zoom";
+
+	var inputs = [xEquationInput, yEquationInput, dtInput, minTInput, maxTInput, zoomInput];
+	var currentInput;
+
+	for(var i = 0; i < inputs.length; i++)
+	{
+		currentInput = inputs[i];
+
+		currentInput.type = "text";
+		currentInput.oninput = function() { go(); };
+	}
+
+	xEquationInput.value = "3*t";
+	yEquationInput.value = "2*t + 1";
+	dtInput.value = 0.1;
+	minTInput.value = 0;
+	maxTInput.value = "Math.PI * 2";
+	zoomInput.value = zoom;
+
+	zoomInput.oninput = function()
+	{
+		zoom = eval(this.value);
+		go();
+	};
+
+	inputContainer.appendChild(xEquationInput);
+	inputContainer.appendChild(yEquationInput);
+	inputContainer.appendChild(dtInput);
+	inputContainer.appendChild(minTInput);
+	inputContainer.appendChild(maxTInput);
+	inputContainer.appendChild(zoomInput);
+
+	ctx = canvas.getContext("2d");
+	document.body.appendChild(canvas);
+	document.body.appendChild(inputContainer);
+
+	go();
+
+	canvas.onclick = function(e)
+	{
+		e.preventDefault();
+		
+		if(e.button == 0)
+		{
+			zoom ++;
+			go();
+		}
+		else
+		{
+			zoom --;
+			go();
+		}
+	};
+
+
+	document.body.onkeypress = function(e)
+	{
+		if(e.key == 'a')
+		{
+			zoom --;
+			go();
+		}
+		else if(e.key == 's')
+		{
+			zoom ++;
+			go();
+		}
+		else if(e.key == 'q')
+		{
+			ctx.translate(ctx.canvas.width/2, ctx.canvas.height/2);
+			ctx.rotate(0.1);
+			ctx.translate(-ctx.canvas.width/2, -ctx.canvas.height/2);
+			go();
+		}
+		else if(e.key == 'w')
+		{
+			ctx.translate(ctx.canvas.width/2, ctx.canvas.height/2);
+			ctx.rotate(-0.1);
+			ctx.translate(-ctx.canvas.width/2, -ctx.canvas.height/2);
+			go();
+		}
+		else if(e.key == 'i')
+		{
+			ctx.translate(0, -50);
+			go();
+		}
+		else if(e.key == "k")
+		{
+			ctx.translate(0, 50);
+			go();
+		}
+		else if(e.key == "j")
+		{
+			ctx.translate(-50, 0);
+			go();
+		}
+		else if(e.key == "l")
+		{
+			ctx.translate(50, 0);
+			go();
+		}
+	};
+}	
+
+main();
+</script>
+</body>
+</html>

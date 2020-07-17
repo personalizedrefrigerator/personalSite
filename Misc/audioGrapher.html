@@ -1,0 +1,538 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Audio Test</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0min-scale=1.0,max-scale=1.0"/>
+<style>
+body
+{
+ background-image: radial-gradient(#ddeeff, white);
+ background-size: 3px 3px;
+}
+
+.containerContainer
+{
+ position: absolute;
+ z-index: 9;
+ top: 0;
+ left: 0;
+ 
+ width: 100vw;
+ height: 100vh;
+
+ filter: opacity(100%)
+
+ transition: 0.5s ease all;
+}
+
+.mainContainer
+{
+ /*position: absolute;
+ z-index: 1;*/
+ display: flex;
+ flex-align: center;
+ justify-content: space-between;
+ height: 50vh;
+ max-width: 500px;
+ flex-direction: column;
+ align-items: stretch;
+
+ margin-left: auto;
+ margin-right: auto;
+
+ border: 1px solid rgba(125, 0, 0, 0.125);
+
+ padding: 4px;
+ border-radius: 2px;
+ border-top-right-radius: 8px;
+
+ background-color: rgba(100, 0, 178, 0.6);
+
+ box-shadow: 7px 4px 3px rgba(0, 0, 0, 0.5);
+
+ transform: rotate(2deg);
+}
+
+.displayCanvas
+{
+ position: absolute;
+ z- index: 0;
+ width: 100vw;
+ height: 100vh;
+
+ filter: opacity(25%);
+
+ top: 0;
+ left: 0;
+}
+
+textarea
+{
+ height: 75%;
+ display: block;
+ font: bold 12pt Serif;
+ background-image: linear-gradient(20deg, rgba(255, 255, 0, 0.5), rgba(0, 255, 255, 0.6));
+
+ background-color: rgba (100, 100, 100, 0.9);
+
+ transform: matrix(1, 0, 0, 1, 0, 0);
+ box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+
+ justify-self: flex-end;
+
+ transition: 0.5s ease all;
+}
+
+textarea:focus
+{
+ background-color: rgba(255, 255, 0, 0.5);
+ transform: matrix(1, 0.01, 0.01, 1, 0, 0);
+ box-shadow: 6px 3px 2px rgba(0, 0, 100, 0.5);
+}
+
+button
+{
+ background-image: radial-gradient(rgba(255, 0, 0, 0.4), rgba(255, 255, 255, 0.2));
+ border: 1px solid gray;
+ border-radius: 4px;
+ background-size: 4px 4px;
+
+ box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.5);
+ background-color: rgba(255, 255, 255, 0.7);
+
+ transform: matrix(1, 0, 0, 1, 0, 0);
+
+ padding: 3%;
+
+ transition: 0.5s ease all;
+}
+
+button:hover, button:active, button:focus
+{
+ background-color: rgba(0, 240, 255, 0.7);
+ transform: matrix(0.6, 0.01, 0, 1, 0, 0);
+}
+</style>
+</head>
+<body>
+
+<script>
+function logError(e)
+{
+ var disp = document.createElement("div");
+ disp.style.border = "4px outset red";
+
+ disp.style.background = "radial-gradient(#eeddee, white)";
+ disp.style.backgroundSize  ="3px 3px";
+
+ disp.style.color = "red";
+
+ disp.style.position = "absolute";
+ disp.style.top = 0;
+ disp.style.left = 0;
+
+ disp.style.boxShadow = "8px 2px 4px rgba(0, 0, 0, 0.5)";
+
+ disp.style.padding = "10px";
+ disp.style.transform = "rotate(4deg)";
+
+ disp.innerText = "Error: " + e;
+
+ document.body.appendChild(disp);
+
+ return disp;
+}
+
+try
+{
+
+function runTransformPart(data, k, probeFunction, dn)
+{
+ var result = 0;
+
+ var len = data.length, y_s, y_p; /* Signal and probe outputs. */
+ 
+ for (var n = 0; n < len; n+=dn)
+ {
+  y_s = data[n];
+  y_p = probeFunction(2*Math.PI*n/len*k);
+
+  result += y_s * y_p;
+ }
+
+ result /= len / dn;
+
+ return result;
+}
+
+function dftPart(data, nyquistF, probeFunction, dk, dn)
+{
+ var result = [];
+
+ for (var k = -nyquistF; k < nyquistF; k+=dk)
+ {
+  result.push(runTransformPart(data, k, probeFunction, dn));
+ }
+
+ return result;
+}
+
+function dftAmplitude(data, nyquistF, dk, dn)
+{
+ var rePart = dftPart(data, nyquistF, Math.cos, dk, dn);
+ var imPart = dftPart(data, nyquistF, Math.sin, dk, dn);
+
+ var result = [];
+
+ for(var k = 0; k < imPart.length && k < rePart.length; k++)
+ {
+  result.push(Math.sqrt(Math.pow(rePart[k], 2) + Math.pow(imPart[k], 2)));
+ }
+
+ return result;
+}
+
+function showAudioData(ctx, data, heightDivisor)
+{
+ var min = 0, max = 0, y;
+ var firstTime = true;
+ var len = data.length;
+ 
+ if (len === 0)
+ {
+    ctx.save();
+    ctx.textBaseline = "bottom";
+    ctx.font = "12pt Serif";
+    ctx.fillStyle = "black";
+    ctx.textAlign = "center";
+    ctx.fillText("Data is empty.", ctx.canvas.width / 2, ctx.canvas.height);
+    ctx.restore();
+ }
+ 
+ heightDivisor = heightDivisor || 1/4.0;
+
+ var dx = dx || Math.floor(len / 512) || 1;
+
+ for(var x = 0; x < len; x+=dx)
+ {
+  y = data[x];
+  if (firstTime)
+  {
+   min = y;
+   max = y;
+   firstTime = false;
+  }
+
+  if (y > max)
+  {
+   max = y;
+  }
+
+  if (y < min)
+  {
+   min = y;
+  }
+ }
+
+ ctx.save();
+ var width = ctx.canvas.width,
+     height = ctx.canvas.height;
+ ctx.lineWidth = 1;
+ 
+
+ var yToScreen = function(y)
+ {
+  y -= min;
+  y /= max - min;
+
+  var maxH = height * heightDivisor;
+
+  y *= maxH;
+
+  y = maxH - y;
+
+  y += (height - maxH) / 2;
+
+  return y;
+ };
+
+ var xToScreen = function(x)
+ {
+  return x / len * width;
+ };
+
+ var sx = 0, lastX = 0, lastY = 0;
+ firstTime = true;
+
+ for (var xI = 0; xI < len; xI+=dx)
+ {
+  y = yToScreen(data[xI]);
+  sx = xToScreen(xI);
+
+  if (!firstTime)
+  {
+   ctx.beginPath();
+   ctx.moveTo(lastX, lastY);
+   ctx.lineTo(sx, y);
+   ctx.stroke();
+  }
+  else
+  {
+   firstTime = false;
+  }
+
+  lastX = sx;
+  lastY = y;
+ }
+
+ ctx.restore();
+}
+
+if (!window.AudioContext)
+{
+    window.AudioContext = window.webkitAudioContext || window.mozAudioContext || window.msAudioContext;
+}
+
+ function main(stream)
+{
+ var container = document.createElement("div");
+ var superContainer = document.createElement("div");
+
+ superContainer.setAttribute("class", "containerContainer");
+
+ var displayCanvas = document.createElement("canvas");
+ var dCtx = displayCanvas.getContext("2d");
+ var aCtx = new AudioContext();
+ var playButton = document.createElement("button");
+ var stopButton = document.createElement("button");
+ var equationInput = document.createElement("textarea");
+ 
+ playButton.innerHTML = "Play";
+ stopButton.innerHTML = "Stop";
+ equationInput.placeholder = "Expression of t.";
+
+ equationInput.style.display = "block";
+ 
+ var scriptProcessor = aCtx.createScriptProcessor(8192, 1, 1); /* 8192 samples, 1 left channel, 1 right channel */
+ var osc = aCtx.createOscillator();
+
+ var streamSource = undefined;
+ if (stream)
+ {
+  streamSource = aCtx.createMediaStreamSource(stream);
+ }
+
+ var g = aCtx.createGain();
+
+ var sin = Math.sin;
+ var equation = function(t, j)
+ {
+  return sin(2*3.14*t*440);
+ };
+
+ var equationStr = equation.toString();
+ var animate;
+
+ equationInput.value = equationStr.substring(equationStr.indexOf("return ") + "return ".length, equationStr.length - 3);
+
+ var equationError = logError("Equation error zone.");
+ equationError.style.display = "none";
+ 
+ equationInput.oninput = function()
+ {
+  if (this.value.length === 0)
+  {
+    return;
+  }
+ 
+  var text = "(function(t, j){ try { return " + this.value + "; } catch(e) { return 0.0; }; return 0.0; })";
+
+  var sin = Math.sin, cos = Math.cos, tan = Math.tan, pi = Math.PI, pow = Math.pow, sec = function(x) { return 1 / Math.cos(x); }, csc = function(x) { return 1 / Math.sin(x); }, cot = function(x) { return 1 / Math.tan(x); }, max = Math.max, min = Math.min;
+  
+  try
+  {
+    equation = eval(text);
+    
+    equationError.style.display = "none";
+    equationError.innerHTML = "OK";
+    
+    // Test the equation.
+    equation((new Date()).getTime(), 0.01);
+  }
+  catch(e)
+  {
+    equation = function(t, j) { return Math.sin(2 * 3.1416 * 440 * t); };
+    
+    equationError.style.display = "block";
+    var errorText = "";
+    
+    if (typeof e === "string")
+    {
+        errorText = e;
+    }
+    else if (e.toString)
+    {
+        errorText = e.toString();
+    }
+    else
+    {
+        errorText = "" + e;
+    }
+    
+    equationError.innerHTML = "<b>Error: </b>" + errorText.split("<").join("&lt;").split(">").join("&gt;").split("&").join("&amp;");
+  }
+ };
+
+ var lastData = [];
+ var nyquistF;
+
+ var t = 0;
+ scriptProcessor.onaudioprocess = function(event)
+ {
+  var inBuffer = event.inputBuffer,
+   outBuffer = event.outputBuffer;
+  //var t = (new Date()).getTime()/1000 % 10;
+  t = t % 240;
+
+  var sampleRate = aCtx.sampleRate;
+  nyquistF = sampleRate / 2;
+  
+  try
+  {
+      for(var i = 0; i < inBuffer.numberOfChannels; i++)
+      {
+       var inDat = inBuffer.getChannelData(i);
+       var outDat = outBuffer.getChannelData(i);
+
+       var max = inDat.length;
+
+       for (var j=0; j < max; j++)
+       {
+        t += 1/sampleRate;
+        outDat[j] = equation(t, inDat[j]);/*inDat[j];*/
+        
+        if (j >= lastData.length)
+        {
+            lastData.push(outDat[j]);
+        }
+        else
+        {
+            lastData[j] = outDat[j];
+        }
+       }
+      }
+  }
+  catch(e)
+  {
+    window.audioError = e;
+  }
+  
+  if (lastData.length > outDat.length)
+  {
+    lastData.splice(outDat.length, lastData.length - outDat.length);
+  }
+ };
+
+ playButton.onclick = function()
+ {
+  if (!streamSource)
+  {
+   osc.connect(scriptProcessor);
+  }
+  else
+  {
+   streamSource.connect(scriptProcessor);
+  }
+
+  scriptProcessor.connect(g);
+  g.connect(aCtx.destination);
+
+  osc.start();
+  
+  animate();
+ };
+
+ var stopAnimate = false;
+
+ superContainer.style.filter = "opacity(100%)";
+ superContainer.style.transition = "0.5s ease all";
+ stopButton.onclick = function()
+ {
+  osc.stop();
+  g.gain.value = 0;
+  superContainer.style.filter = "opacity(0%)";
+  stopAnimate = true;
+ };
+
+ var dftData = [];
+ var animationCount = 0;
+
+ animate = function()
+ {
+  var ctx = dCtx;
+
+  if (ctx.canvas.width != ctx.canvas.clientWidth || ctx.canvas.height != ctx.canvas.clientHeight)
+  {
+   ctx.canvas.width = ctx.canvas.clientWidth;
+   ctx.canvas.height = ctx.canvas.clientHeight;
+  }
+
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  ctx.strokeStyle = "rgba(0, 0, 0, 0.9)";
+
+  showAudioData(ctx, lastData);
+  window.lastData = lastData;
+
+  if (animationCount % 100 == 0)
+  {
+   dftData = dftAmplitude(lastData, lastData.length / 16, lastData.length / 256 / 8, 2);
+  }
+  
+  ctx.strokeStyle = "rgba(255, 0, 0, 0.9)";
+  showAudioData(ctx, dftData, 1);
+
+  animationCount++;
+
+  if(!stopAnimate) { requestAnimationFrame(animate); }
+ };
+
+ container.appendChild(playButton);
+ container.appendChild(stopButton);
+ container.appendChild(equationInput);
+ container.setAttribute("class", "mainContainer");
+ displayCanvas.setAttribute("class", "displayCanvas");
+ superContainer.appendChild(container);
+ document.body.appendChild(superContainer);
+
+ document.body.appendChild(displayCanvas);
+}
+
+ var getUserMedia = navigator.getUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia || navigator.msGetUserMedia;
+
+ navigator.mediaDevices.getUserMedia({audio: true}).then(function(stream)
+ {
+  try
+  {
+   main(stream);
+  }
+  catch (e)
+  {
+   logError("M " + e);
+  }
+ }).catch(function(e)
+ {
+  logError("2 " + e);
+
+  main();
+ });
+}
+catch(e)
+{
+ logError("3 " + e);
+ main();
+}
+</script>
+</body>
+</html>
+

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,min-scale=1.0,max-scale=2.0"/>
+<title>Index of ./Misc</title>
+
+<style>
+    @keyframes transitionIn
+    {
+        0% { transform: scale(0, 0) rotate(-10deg); filter: opacity(0%) sepia(100%); }
+        100% { transform: scale(1, 1) rotate(4deg); filter: opacity(100%) sepia(0%); }
+    }
+    
+    body
+    {
+        background-image: radial-gradient(rgba(255, 255, 0, 0.6), rgba(255, 255, 255, 0.7));
+        background-size: 6px 6px;
+    }
+
+    #content
+    {
+        box-shadow: 3px 4px 3px rgba(0, 0, 0, 0.3), inset 4px 3px 3px rgba(0, 0, 0, 0.02);
+        border-bottom-right-radius: 15px;
+        
+        background-color: rgba(255, 255, 255, 0.7);
+        
+        margin-left: auto;
+        margin-right: auto;
+        
+        max-width: 500px;
+        
+        margin-top: 5vh;
+        padding: 10px;
+        
+        background-image: linear-gradient(12deg, rgba(255, 255, 255, 0.9), rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.9));
+        
+        transform: matrix(1, 0, 0, 1, 0, 0) rotate(4deg);
+        filter: opacity(100%);
+        
+        animation: transitionIn 1s ease;
+        
+        transition: 0.6s ease all;
+    }
+    
+    #content:hover
+    {
+        transform: matrix(1, 0, 0, 1, 0, 0) rotate(4deg);
+        background-color: rgba(255, 255, 255, 1);
+        box-shadow: -1px 4px 3px rgba(0, 0, 0, 0.3), inset 4px 3px 3px rgba(0, 0, 0, 0.02);
+    }
+    
+    a
+    {
+        color: orange;
+        text-decoration: underline;
+        text-shadow: 1px 2px 1px 2px rgba(0, 0, 0, 0.5);
+        display: inline-block;
+        
+        transform: rotate(0deg);
+        
+        transition: 0.4s ease transform;
+    }
+    
+    a:hover
+    {
+        transform: rotate(-1deg);
+    }
+    
+    a:visited
+    {
+        color: rgba(100, 100, 0, 0.7);
+    }
+    
+    @media screen and (max-width: 600px)
+    {
+        @keyframes transitionIn
+        {
+            0% { transform: scale(0, 0) rotate(-10deg); filter: opacity(0%) sepia(100%); }
+            100% { transform: scale(1, 1) rotate(0deg); filter: opacity(100%) sepia(0%); }
+        }
+        
+        #content
+        {
+            transform: rotate(360deg);
+            margin-top: 0px;
+            box-shadow: -3px 2px 5px rgba(0, 0, 0, 0.4);
+            background-color: rgba(255, 255, 255, 1);
+            
+            
+            border-radius: 4px;
+        }
+        
+        #content:hover
+        {
+            transform: rotate(360deg);
+        }
+        
+        body
+        {
+            padding: 0px;
+        }
+    }
+    
+    @media print
+    {
+        #content
+        {
+            transform: rotate(0deg);
+            margin-top: 0px;
+            box-shadow: none;
+            
+            background-image: none;
+        }
+        
+        #content:hover
+        {
+            transform: rotate(0deg);
+        }
+        
+        body
+        {
+            background-image: none;
+            background-color: white;
+            padding: 0px;
+        }
+    }
+</style>
+
+</head>
+<body>
+<div id="content">
+<h1>./Misc</h1>
+<a href="../404.html">Up</a>
+<ul>
+<li><a href="audioGrapher.html">audioGrapher.html</a></li>
+<li><a href="./conwayLifeGame.html">conwayLifeGame.html <i>(This is old, please excuse the poor user-interface)</i>.</a></li>
+<li><a href="./Maze/index.html">Maze/index.html</a></li>
+<li><a href="Metronome2.html">Metronome2.html</a></li>
+<li><a href="PARAMETRIC.html">PARAMETRIC.html</a></li>
+<li><a href="POLAR.html">POLAR.html</a></li>
+<li><a href="zeroFinder.html">zeroFinder.html</a></li>
+<li><a href="textEditor.html">textEditor.html</a></li>
+<li><a href="newton_sMethod.html">Newton&lsquo;s Method Fractal</a></li>
+<li><a href="miscTools.html">miscTools.html</a></li>
+</ul>
+</div>
+</body>
+</html>
