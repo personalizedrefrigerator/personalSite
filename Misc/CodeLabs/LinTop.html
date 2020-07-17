@@ -6,6 +6,12 @@
     <title>LinTop</title>
 
     <style>
+body
+{
+    background-image: radial-gradient(rgba(100, 100, 50, 0.5), rgba(100, 100, 0, 0.8));
+    background-size: 5px 5px;
+}
+
 .content
 {
     margin-left: auto;
@@ -18,9 +24,16 @@
 
     background-color: white;
     color: black;
+
+    font: 12pt Sans;
 }
 
-.header
+.content p
+{
+    text-indent: 4px;
+}
+
+header
 {
     position: sticky;
     background-color: black;
@@ -39,9 +52,14 @@
         color: auto;
     }
 
-    .header
+    header
     {
         display: none;
+    }
+
+    body
+    {
+        background-image: none;
     }
 }
     </style>
