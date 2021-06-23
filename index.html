@@ -34,9 +34,9 @@
     left:0;
     top: 0;
     right: 0;
-    
+
     z-index: 9;
-    
+
     animation: fadeIn 1s;
 }
 .title
@@ -47,9 +47,9 @@
     width: 100%;
     left: 0;
     right: 0;
-    
+
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-    
+
     font-size: 2em;
 }
 
@@ -67,7 +67,7 @@
 
 .menuContainer
 {
-    
+
 }
 
 .smallImage > img
@@ -86,11 +86,11 @@
     bottom: 0;
     z-index: 999;
     filter: opacity(100%);
-    
+
     background-image: radial-gradient(10deg, white, gray, white);
-    
+
     transition: 0.5s ease filter;
-    
+
     animation: fadeIn 0.1s linear;
 }
 
@@ -108,7 +108,7 @@ body
     background-color: rgba(255, 255, 255, 0.9);
     background-size: 5px 5px;
     overflow-x: hidden;
-    
+
     transition: 1s ease background-color, background-size;
 }
 
@@ -122,20 +122,20 @@ h1
     background-size: auto 14em;
     background-repeat: no-repeat;
     background-position-x: center;
-    
+
     border: none;
     border-radius: 8px;
     filter: sepia(0%) contrast(100%);
-    
+
     height: 7em;
-    
+
     text-align: center;
     padding-top: 6em;
-    
+
     text-shadow: 2px 2px 1px rgba(255, 255, 255, 0.8);
-    
+
     background-color: rgba(100, 100, 100, 0.1);
-    
+
     transition: 1.6s ease all;
 }
 
@@ -155,11 +155,11 @@ h1
     height: calc(100vh - 4em);
     overflow-y: scroll;
     overflow-x: hidden;
-    
+
     font-size: 24pt;
-    
+
     padding: 25px;
-    
+
     position: fixed;
     top:0;
     left: 0;
@@ -218,20 +218,20 @@ button:hover, .menu:hover
 {
     transform: scale(1, 1);
     filter: opacity(100%);
-    
+
     border-radius: 10px;
-    
+
     overflow: hidden;
-    
+
     z-index: 10;
-    
+
     isolation: isolate;
     position: sticky; /* This isn't what sticky positioning is for,
                          but this works around a bug in Chrome (or
                          maybe the bug is in Firefox) and brings
                          the element to the fore.
                          */
-    
+
     transition: 1s ease all;
 }
 
@@ -239,9 +239,9 @@ button:hover, .menu:hover
 {
     transform: scale(2.5, 2.5);
     filter: opacity(95%);
-    
+
     border-radius: 0px;
-    
+
     z-index: 99;
 }
 
@@ -284,7 +284,7 @@ a
 {
     display: inline-block;
     width: 0.7em;
-    
+
     border-bottom: 1px solid black;
     margin-bottom: 0.3em
 }
@@ -293,9 +293,9 @@ a
 {
     width: 0.6em;
     height: 0.6em;
-    
+
     transform: rotate(0deg);
-    
+
     transition: 0.4s ease all;
 }
 
@@ -307,18 +307,18 @@ a
 .dropdownTitle
 {
     cursor: pointer;
-    
+
     overflow: auto;
-    
+
     transform: scale(1, 1) rotate(0deg);
     transform-origin: left;
-    
+
     border-top-right-radius: 4px;
-    
+
     background-color: rgba(255, 255, 255, 0.8);
     background-image: linear-gradient(10deg, white, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.6), white);
     background-size: 100% 100%;
-    
+
     transition: 1s ease all;
 }
 
@@ -326,7 +326,7 @@ a
 {
     transform: scale(0.95, 1) rotate(-0.2deg);
     background-size: 200% 100%;
-    
+
     background-color: rgba(255, 200, 100, 0.8);
 }
 
@@ -337,7 +337,7 @@ a
     border-bottom: 1px solid black;
     border-top: 0px solid black;
     border-left: 0px solid black;
-    
+
     padding-left: 5px;
 }
 
@@ -348,7 +348,7 @@ a
     border-bottom: 0px solid black;
     border-top: 1px solid black;
     border-left: 1px solid black;
-    
+
     padding-left: 3px;
 }
 
@@ -362,9 +362,9 @@ a
 {
     padding-left: 1em;
     overflow: hidden;
-    
+
     border-left: 1px solid black;
-    
+
     transition: 0.5s ease all;
 }
 
@@ -372,23 +372,23 @@ a
 {
     transform: scale(1, 0.01);
     max-height: 0px;
-    
+
     transform-origin: top;
-    
+
     outline-top: 1px solid rgba(0, 0, 0, 1);
-    
+
     transition: 0.5s ease transform, 1s ease max-height;
 }
 
 .dropdownShown
 {
-    max-height: 5000px; /* This is a somewhat messy option -- the maximum height 
+    max-height: 5000px; /* This is a somewhat messy option -- the maximum height
                           still might be exceeded; however, it does create
                           a nice transition. */
     transform: scale(1, 1);
-    
+
     transform-origin: top;
-    
+
     transition: 0.5s ease transform, 1s ease max-height;
 }
 
@@ -411,12 +411,12 @@ a:visited
         max-width: 800px;
         border-radius: 0px;
     }
-    
+
     .header
     {
         position: absolute;
     }
-    
+
     body
     {
         padding: 0px;
@@ -434,12 +434,12 @@ a:visited
         background-color: white;
         color: black;
     }
-    
+
     .header
     {
         display: none;
     }
-    
+
     #content
     {
         max-width: none;
@@ -447,13 +447,13 @@ a:visited
         box-shadow: none;
         border: 0px solid white;
     }
-    
+
     .dropdownContent, .dropdownHidden
     {
         max-height: 100vh !important;
         transform: scale(1, 1);
     }
-    
+
     .pageArticle
     {
         display: block !important;
@@ -601,7 +601,7 @@ A random dot stereogram. With proper eye-focus, dots are interpreted differently
     try
     {
       // Initialize Firebase
-      var config = 
+      var config =
       {
         apiKey: "AIzaSyA-6ZNhrT2Qo3tzLMS_expYIR5EdqAGUXI",
         authDomain: "henry-heino.firebaseapp.com",
@@ -612,20 +612,20 @@ A random dot stereogram. With proper eye-focus, dots are interpreted differently
       };
 
       firebase.initializeApp(config);
-      
+
       progress = 1;
-      
+
       window.database = firebase.database();
-      
+
       progress = 2;
-      
+
       window.pages = database.ref("pages");
       window.users = database.ref("users");
       window.menus = database.ref("menus");
       window.surveys = database.ref("surveys");
-      
+
       progress = 3;
-      
+
       window.authorization = firebase.auth();
       window.storage=firebase.storage();
       window.storageRef=storage.ref();
@@ -650,19 +650,19 @@ function closablePopup(content, submitContent, animateBackgroundCtx, onComplete)
     var submitButton = document.createElement("button");
     var backgroundCanvas = document.createElement("canvas");
     var ctx = backgroundCanvas.getContext("2d");
-    
+
     backgroundCanvas.style.width = "100%";
     backgroundCanvas.style.height = "100%";
     backgroundCanvas.style.position = "absolute";
     backgroundCanvas.style.top = 0;
     backgroundCanvas.style.left = 0;
     backgroundCanvas.style.zIndex = 0;
-    
+
     submitButton.setAttribute("tabIndex", 0);
-    
+
     var animationRunning = true;
     var state = {};
-    
+
     var animate = function()
     {
         if(animationRunning && animateBackgroundCtx)
@@ -672,44 +672,44 @@ function closablePopup(content, submitContent, animateBackgroundCtx, onComplete)
                 backgroundCanvas.width = backgroundCanvas.clientWidth;
                 backgroundCanvas.height = backgroundCanvas.clientHeight;
             }
-        
+
             animateBackgroundCtx(ctx, state);
-            
+
             requestAnimationFrame(animate);
         }
     };
-    
+
     animate();
-    
+
     submitButton.innerHTML = submitContent;
-    
+
     var contentDescription = document.createElement("div");
     contentDescription.innerHTML = content;
-    
+
     contentDescription.setAttribute("class", "contentDescription");
     contentWindow.setAttribute("class", "contentWindow");
     submitButton.setAttribute("class", "largeSubmitButton");
     submitButton.style.float = "right";
-    
+
     contentWindow.appendChild(contentDescription);
     contentWindow.appendChild(backgroundCanvas);
     contentWindow.appendChild(submitButton);
-    
+
     loadImages(contentWindow);
-    
+
     document.body.appendChild(contentWindow);
-    
-    submitButton.addEventListener("click", function() 
+
+    submitButton.addEventListener("click", function()
     {
         animationRunning = false;
-        
+
         if(onComplete)
         {
             onComplete();
         }
-        
+
         contentWindow.style.filter = "opacity(0%)";
-        
+
         setTimeout(function()
         {
             contentWindow.outerHTML = "";
@@ -721,16 +721,16 @@ function loadImages(element)
 {
     var imagesToLoad = document.getElementsByClassName("imageToLoad");
     var backgroundsToLoad = document.getElementsByClassName("backgroundToLoad");
-    
+
     var load = function(element, asBackground)
     {
         if(element.getAttribute("name") === "loadedImage")
         {
             return;
         }
-        
+
         var src = element.innerHTML;
-        
+
         if(element.children.length > 0 && asBackground)
         {
             src = element.children[0].innerHTML;
@@ -740,16 +740,16 @@ function loadImages(element)
         {
             element.innerHTML = "";
         }
-        
+
         element.setAttribute("name", "loadedImage");
-        
+
         var currentImage;
-        
+
         if(!asBackground)
         {
             currentImage = new Image();
         }
-        
+
         storageRef.child(src).getDownloadURL().then(function(url)
         {
             if(!asBackground)
@@ -766,12 +766,12 @@ function loadImages(element)
             showError(error, "loadImages");
         });
     };
-    
+
     for(var i = 0; i < imagesToLoad.length; i++)
     {
         load(imagesToLoad[i]);
     }
-    
+
     for(var i = 0; i < backgroundsToLoad.length; i++)
     {
         load(backgroundsToLoad[i], true);
@@ -781,32 +781,32 @@ function loadImages(element)
 function loadPages(pagesListContainer)
 {
     var pagesList = document.getElementsByClassName("pageArticle");
-    
+
     var previousShownPage = {};
-    
+
     let currentPageIndex = 0;
     var handlePage = function(pageElement)
     {
         var goToPage = document.createElement("button");
         goToPage.innerHTML = pageElement.getAttribute("name");
-        
+
         goToPage.setAttribute("tabIndex", ++currentPageIndex);
-        
+
         pagesListContainer.appendChild(goToPage);
-        
+
         if(!previousShownPage.defined)
         {
             previousShownPage = {pageElement: pageElement, goToPage: goToPage, defined: true};
             goToPage.style.backgroundColor = "rgba(0, 255, 0, 0.7)";
         }
-        
+
         goToPage.onclick = function()
         {
             goToPage.style.backgroundColor = "rgba(0, 255, 0, 0.7)";
-            
+
             var opacity = 1;
             var lastTime = (new Date()).getTime();
-            
+
             var animateOpacity = function()
             {
                 var nowTime = (new Date()).getTime();
@@ -815,36 +815,36 @@ function loadPages(pagesListContainer)
                     previousShownPage.pageElement.style.display = "none";
                     previousShownPage.pageElement.style.filter = "";
                     previousShownPage.goToPage.style.backgroundColor = "";
-                    
+
                     pageElement.style.display = "block";
                     pageElement.style.animation = "fadeIn 1.0s";
                     pageElement.style.animationPlayState = "running";
-                    
+
                     previousShownPage = {pageElement: pageElement, goToPage: goToPage};
                 }
                 else
                 {
                     previousShownPage.pageElement.style.filter = "opacity(" + Math.floor(opacity * 100) + "%)";
                     opacity -= 0.005 * (nowTime - lastTime);
-                    
-                    
+
+
                     lastTime = nowTime;
-                    
+
                     requestAnimationFrame(animateOpacity);
                 }
             };
-            
+
             animateOpacity();
         };
     };
-    
+
     for(var i = 0; i < pagesList.length; i++)
     {
         if(i > 0)
         {
             pagesList[i].style.display = "none";
         }
-        
+
         handlePage(pagesList[i]);
     }
 }
@@ -852,24 +852,24 @@ function loadPages(pagesListContainer)
 function renderSwivleArrow(canvas)
 {
     canvas.width = 20;
-    canvas.height = 20;    
-    
+    canvas.height = 20;
+
     let ctx = canvas.getContext("2d");
-    
+
     ctx.beginPath();
-    
+
     ctx.moveTo(0, 0);
     ctx.lineTo(ctx.canvas.width, ctx.canvas.height / 2);
     ctx.lineTo(0, ctx.canvas.height);
     ctx.lineTo(0, 0);
-    
+
     ctx.fill();
 }
 
 function enableDropdowns()
 {
     let dropdownContainers = document.getElementsByClassName("dropdown");
-    
+
     // Handle a single dropdown element.
     //Does nothing if the element is null/zero/undefined
     //or it has fewer than two child elements.
@@ -880,34 +880,34 @@ function enableDropdowns()
         {
             return;
         }
-        
+
         // Get the segments.
         let dropdownTitleContainer = element.children[0];
         let dropdownContent = element.children[1];
         let dropdownTitle = document.createElement("span");
         let swivleArrow = document.createElement("canvas");
-        
+
         renderSwivleArrow(swivleArrow);
-        
+
         // Style the segments.
         dropdownContent.classList.add("dropdownContent");
         dropdownContent.classList.add("dropdownHidden");
         dropdownTitleContainer.classList.add("dropdownTitle");
         dropdownTitleContainer.classList.add("dropdownTitleClosed");
         swivleArrow.classList.add("swivleableArrow");
-        
+
         dropdownTitleContainer.setAttribute("tabindex", 1);
-        
+
         // Configure the container.
         dropdownTitle.innerHTML = dropdownTitleContainer.innerHTML + ""; // Prevent refrencing.
         dropdownTitleContainer.innerHTML = "";
-        
+
         // Add children.
         dropdownTitleContainer.appendChild(swivleArrow);
         dropdownTitleContainer.appendChild(dropdownTitle);
-        
+
         let expanded = false;
-        
+
         // Event listeners.
         dropdownTitleContainer.addEventListener("click", function(event)
         {
@@ -917,7 +917,7 @@ function enableDropdowns()
                 dropdownContent.classList.add("dropdownShown");
                 dropdownTitleContainer.classList.remove("dropdownTitleClosed");
                 dropdownTitleContainer.classList.add("dropdownTitleOpen");
-                
+
                 swivleArrow.style.transform = "rotate(90deg)";
                 dropdownContent.style.height = "auto";
             }
@@ -927,14 +927,14 @@ function enableDropdowns()
                 dropdownContent.classList.add("dropdownHidden");
                 dropdownTitleContainer.classList.add("dropdownTitleOpen");
                 dropdownTitleContainer.classList.remove("dropdownTitleClosed");
-                
+
                 swivleArrow.style.transform = "rotate(0deg)";
             }
-            
+
             expanded = !expanded;
         }, true); // Permit bubbling.
     };
-    
+
     for (let i = 0; i < dropdownContainers.length; i++)
     {
         handleDropdown(dropdownContainers[i]);
@@ -959,9 +959,9 @@ function main()
             state.lastY = 0;
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         }
-        
+
         ctx.save();
-        
+
         if(Math.random() < 0.5)
         {
             ctx.fillStyle = "rgba(100, 100, 255, 0.01)";
@@ -969,14 +969,14 @@ function main()
             ctx.arc(Math.random() * ctx.canvas.width, Math.random() * ctx.canvas.height, Math.random() * Math.min(ctx.canvas.width, ctx.canvas.height) / 2, 0, Math.PI * 2, true);
             ctx.fill();
         }
-        
+
         ctx.fillStyle = "rgba(0, 200, 100, 0.2)";
         ctx.font = Math.ceil(3 * Math.random() + 6) * 3 + "pt Serif";
-        
+
         var usedLetter;
-        
+
         var maxLetters = 120 * Math.random() / (state.lastLetterIndex / 30 + 1);
-        
+
         if(maxLetters < 1)
         {
             if(Math.random() > 1 / (state.lastLetterIndex / 10 + 1) + 0.3)
@@ -984,14 +984,14 @@ function main()
                 return;
             }
         }
-        
+
         for(var i = 0; i < maxLetters; i++)
         {
-        
+
             usedLetter = html[state.lastLetterIndex];
-            
+
             ctx.fillText(usedLetter, state.lastX, state.lastY);
-            
+
             state.lastLetterIndex++;
             if(usedLetter !== "\n")
             {
@@ -1002,43 +1002,43 @@ function main()
                 state.lastX = 0;
                 state.lastY += ctx.measureText("W.").width;
             }
-            
+
             if(state.lastX >= ctx.canvas.width)
             {
                 state.lastX = 0;
                 state.lastY += ctx.measureText("W").width;
             }
-            
+
             if(state.lastLetterIndex >= html.length || state.lastY >= ctx.canvas.height)
             {
                 if(state.lastLetterIndex >= html.length)
                 {
                     state.lastLetterIndex = 0;
                 }
-                
+
                 state.lastX = 0;
                 state.lastY = 0;
-                
+
                 state.clearCount = 0;
             }
         }
-        
+
         if(state.clearCount < 50)
         {
             ctx.save();
             ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
             ctx.fillRect(0, 0, ctx.canvas.width * Math.random(), ctx.canvas.height);
             ctx.restore();
-            
+
             state.clearCount++;
         }
-        
+
         ctx.restore();
     }, function()
     {
         document.body.style.overflow = "auto";
     });
-    
+
     // Show the closable popup BEFORE
     //loading content -- helps prevent
     //a sudden opening of the initial section.
