@@ -1,3 +1,6 @@
 [submodule "Misc/Misc/LibJS"]
 	path = Misc/Misc/LibJS
 	url = git@github.com:personalizedrefrigerator/LibJS.git
+[submodule "Misc/LibJS"]
+	path = Misc/LibJS
+	url = git@github.com:personalizedrefrigerator/LibJS.git
