@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html style = "padding: 0px;">
 <head>
+    <meta charset="utf-8"/>
     <meta name="viewport" content="user-scalable=no,width=device-width,initial-scale=1.0,min-zoom=1.0,max-zoom=1.0"/>
 	<meta name="apple-mobile-web-app-capable" content="yes"/>
 	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
@@ -42,21 +43,21 @@
 </head>
     <body>
     <!-- Include Libraries -->
-    <script src = "Libs/ArrayHelper.js"></script>
-    <script src = "Libs/JSHelper.js"></script>
-    <script src = "Libs/Keyboard.js" encoding = "utf-8"></script>
-    <script src = "Libs/Point.js" encoding = "utf-8"></script>
-    <script src = "Libs/MathHelper.js" encoding = "utf-8"></script>
-    <script src = "Libs/HighlightSchemes.js" encoding = "utf-8"></script>
-    <script src = "Libs/SyntaxHelper.js" encoding = "utf-8"></script>
-    <script src = "Libs/Line.js" encoding = "utf-8"></script>
-    <script src = "Libs/Editor.js" encoding = "utf-8"></script>
+    <script src = "LibJS/Libs/ArrayHelper.js"></script>
+    <script src = "LibJS/Libs/JSHelper.js"></script>
+    <script src = "LibJS/Libs/Keyboard.js" encoding = "utf-8"></script>
+    <script src = "LibJS/Libs/Point.js" encoding = "utf-8"></script>
+    <script src = "LibJS/Libs/MathHelper.js" encoding = "utf-8"></script>
+    <script src = "LibJS/Libs/HighlightSchemes.js" encoding = "utf-8"></script>
+    <script src = "LibJS/Libs/SyntaxHelper.js" encoding = "utf-8"></script>
+    <script src = "LibJS/Libs/Line.js" encoding = "utf-8"></script>
+    <script src = "LibJS/Libs/Editor.js" encoding = "utf-8"></script>
     
     <!-- Main Content -->
         <script>
 "use strict";
 
-function noteError(e)
+noteError = function(e)
 {
     var result = "ERROR:\n";
 
