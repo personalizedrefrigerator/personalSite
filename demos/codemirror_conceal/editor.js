@@ -43,7 +43,7 @@ class CheckboxWidget extends WidgetType {
     };
 };
 
-function checkboxes(view) {
+function checkboxes(view, conceal) {
     let widgets = [];
     for (let {from, to} of view.visibleRanges) {
         syntaxTree(view.state).iterate({
@@ -52,11 +52,18 @@ function checkboxes(view) {
                 if (node.name == "TaskMarker") {
                     let content = view.state.doc.sliceString(node.from, node.to);
                     let isChecked = content.toLowerCase().indexOf("x") != -1;
-                    let decoration = Decoration.widget({
-                        widget: new CheckboxWidget(isChecked),
-                        side: 0,
-                    });
-                    widgets.push(decoration.range(node.to - 1));
+                    if (conceal) {
+                        let decoration = Decoration.replace({
+                            widget: new CheckboxWidget(isChecked),
+                        });
+                        widgets.push(decoration.range(node.to - 2, node.to - 1));
+                    } else {
+                        let decoration = Decoration.widget({
+                            widget: new CheckboxWidget(isChecked),
+                            side: 0,
+                        });
+                        widgets.push(decoration.range(node.to - 1));
+                    }
                 }
 
             },
@@ -65,16 +72,16 @@ function checkboxes(view) {
     return Decoration.set(widgets);
 }
 
-const checkboxPlugin = ViewPlugin.fromClass(class {
+const checkboxPlugin = conceal => ViewPlugin.fromClass(class {
     decorations;
 
     constructor(view) {
-        this.decorations = checkboxes(view);
+        this.decorations = checkboxes(view, conceal);
     };
 
     update(update) {
         if (update.docChanged || update.viewportChanged) {
-            this.decorations = checkboxes(update.view);
+            this.decorations = checkboxes(update.view, conceal);
         }
     };
 }, {
@@ -106,18 +113,24 @@ function toggleCheckbox(view, pos) {
     return true;
 }
 
-let editor = new EditorView({
-    extensions: [
-        basicSetup,
-        markdown({
-            extensions: [GFM],
-        }),
-        checkboxPlugin,
-    ],
-    doc: `# Testing
+function createEditor(container, conceal) {
+    return new EditorView({
+        extensions: [
+            basicSetup,
+            markdown({
+                extensions: [GFM],
+            }),
+            checkboxPlugin(conceal),
+        ],
+        doc: `# Testing
 - [x] Hello
 - [ ] World
 - [ ] This is a checklist item.
-    `,
-    parent: document.body,
-});
+        `,
+        parent: container,
+    });
+}
+
+createEditor(document.querySelector("#editorUnconcealed"), false);
+createEditor(document.querySelector("#editorConcealed"), true);
+
