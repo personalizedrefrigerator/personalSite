@@ -1,0 +1,5 @@
+node_modules/
+package-lock.json
+
+# Do commit the editor.bundle.js — we're serving
+# it on GitHub pages
