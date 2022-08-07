@@ -191,6 +191,23 @@ If enabled, errors will be logged to this textarea.
 						);
 					};
 
+					const downloadButton = popup.document.createElement('button');
+					downloadButton.innerText = 'Download';
+					downloadButton.onclick = () => {
+						const blob = new Blob([ imgHTML ], { type: 'image/svg' });
+						const objectURL = URL.createObjectURL(blob);
+	
+						const link = popup.document.createElement('a');
+						link.href = objectURL;
+						link.innerText = 'Download';
+						// Download as: (Ref: https://stackoverflow.com/a/52814195/17055750)
+						link.setAttribute('download', 'editor-save.svg');
+
+						downloadButton.replaceWith(link);
+						link.click();
+					};
+					popup.document.body.appendChild(downloadButton);
+
 					let localStorageSaveStatus = 'Unable to save to localStorage. ';
 					if (window.localStorage) {
 						// Save
