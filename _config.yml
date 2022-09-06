@@ -55,9 +55,9 @@ plugins:
 
 permalink: pretty
 
-favicon_url_absolute: /main/favicon.png
+favicon_url_absolute: /personalSite/favicon.png
 hematite:
-  auto_invert_imgs: true
+  auto_invert_imgs: false
 
   # Set to true to minimize the header by default
   minimize_header: false

@@ -5,6 +5,8 @@ katex: true
 tags: gsoc joplin
 ---
 
+{% assign assets_dir = '/assets/img/posts/2022-09-05-gsoc-final-reflection/' %}
+
 <!-- Relevant links -->
 [Weekly status updates][weekly-status-updates] | [GSoC project page][gsoc-project-page] | [GSoC pull requests][gsoc-pull-requests]
 
@@ -21,8 +23,9 @@ tags: gsoc joplin
 Try `js-draw` below!
 
 <script
-    src="https://cdn.jsdelivr.net/npm/js-draw@0.1.5/dist/bundle.js" 
-    integrity="sha256-dC5D1IABa1wrWnhEUqdgUKasVOLg2UC5kJ+yX8/PpKA=" crossorigin="anonymous"
+    src="https://cdn.jsdelivr.net/npm/js-draw@0.1.6/dist/bundle.js" 
+    integrity="sha256-DWAuEKrcAEBlWF1NjL89XzaKiImoIkZZvdOjyqUK2ag="
+    crossorigin="anonymous"
 ></script>
 <script>
     // Adds a save action to a js-draw editor's toolbar.
@@ -75,11 +78,9 @@ Try `js-draw` below!
       * <div id='jsDrawDemo-2'></div>
     * This uses [bezier-js](https://www.npmjs.com/package/bezier-js) for projecting points onto Bézier curves, finding normals, and Bézier curve intersection testing.
 
-{% comment %}
 <script>
     initEditor('#jsDrawDemo-2', `<svg viewBox="188 133 785.7807895409187 481" width="785.7807895409187" height="481" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg"><path d="M883,135Q877,358 847,402L915,446Q957,375 963,137M847,402Q784,533 655,383L597,439Q789,614 915,446M655,383Q636,363 582,290L516,338Q573,415 597,439M582,290Q552,256 443,224L421,302Q513,327 516,338M443,224Q352,212 271,362L343,398Q395,281 421,302M271,362Q235,434 210,463L272,515Q303,478 343,398M210,463Q197,479 188,505L264,531Q268,518 272,515" fill="#803380"></path><path d="M444,225Q437,256 422,308L424,308Q439,257 446,225" fill="#cc6633"></path><path d="M272,365Q333,401 341,402L341,400Q334,399 274,363" fill="#cc6633"></path><path d="M212,468Q222,477 251,505L253,503Q224,475 214,466M251,505Q254,508 264,515L266,513Q256,506 253,503M264,515Q265,515 267,519L269,517Q267,514 266,513" fill="#cc6633"></path><path d="M517,339Q534,328 585,297L583,295Q532,327 515,337M585,297Q585,296 587,295L585,293Q584,295 583,295" fill="#cc6633"></path><path d="M599,440Q637,387 649,380L647,378Q636,385 597,438" fill="#cc6633"></path><path d="M849,402Q906,426 910,434L912,434Q907,424 849,400M910,434Q912,438 919,447L921,445Q914,437 912,434" fill="#cc6633"></path><path d="M885,135Q931,141 963,141L963,139Q931,139 885,133" fill="#cc6633"></path><path d="M190,508Q209,513 267,532L267,530Q210,512 190,506" fill="#cc6633"></path><text style="transform: matrix(0.887799, 0, 0, 0.887799, 285.5, 543.8); font-family: sans-serif; font-size: 32px; fill: rgb(128, 113, 51);">Each segment (marked in orange) is made up of</text><text style="transform: matrix(0.887799, 0, 0, 0.887799, 286.4, 568.9); font-family: sans-serif; font-size: 32px; fill: rgb(128, 113, 51);">two lines and two Bézier curves.</text><text style="transform: matrix(0.887799, 0, 0, 0.887799, 289.1, 599); font-family: sans-serif; font-size: 32px; fill: rgb(128, 113, 51);">Fitting is done with heuristics.</text></svg>`);
 </script>
-{% endcomment %}
 
 ## What's done
  - [x] Tool that allows adding text to an image.
@@ -93,21 +94,38 @@ Try `js-draw` below!
 # The markdown toolbar
 [UI pull request][markdown-toolbar-ui-pr] | [Markdown commands pull request][markdown-commands-pr]
 
+![Screenshot of the markdown toolbar, showing buttons for bold, italicize, toggle code, show more, link, search, and hide keyboard]({{ assets_dir | append: 'markdown-toolbar-screenshot-1.png' | relative_url }})
+
+The markdown toolbar is a feature added to Joplin's (beta) mobile editor. It allows quickly changing the formatting of a region.
+
 ## What's done
- - [x] Find and replace tool
+ - Find and replace tool
+    - [x] Implemented and merged
  - Markdown commands
     - [x] Bold, italicize, toggle code region, toggle $$\TeX$$ region, toggle header
     - [x] Edit/insert link
- - [x] Markdown toolbar
+ - Markdown toolbar
+    - [x] Implemented and merged
  - CodeMirror GUI
-    - [x] Added syntax highlighting for math ($$\KaTeX$$) regions in the CodeMirror 6 editor.
-        - This involved writing a custom CodeMirror parser to recognize regions surrounded by `$`s and `$$`s.
-    - [x] Added syntax highlighting for fenced code regions
-        - This *did not* require writing a custom parser.
 
 ## Bugs and what isn't done
+ - [ ] Large amount of space beneath toolbar on some iOS devices ([open pull request](https://github.com/laurent22/joplin/pull/6823))
+ - [ ] On iOS, the keyboard for the markdown editor is always in light mode
+    - As of the time of this writing, [`react-native-webview` doesn't support this](https://github.com/react-native-webview/react-native-webview/issues/1634). I tried adding support, but [didn't understand the suggested solution](https://stackoverflow.com/questions/28664984/custom-webview-keyboard-issues/47949089#47949089) (I'm new to Objective-C) and had trouble building/deploying `react-native-webview` to an iOS device.
+    - [Joplin issue tracker](https://github.com/laurent22/joplin/issues/5775)
+
+# Better markdown syntax highlighting
+
+- [x] Added syntax highlighting for math ($$\KaTeX$$) regions in the CodeMirror 6 editor.
+    - This involved writing a custom CodeMirror parser to recognize regions surrounded by `$`s and `$$`s.
+- [x] Added syntax highlighting for fenced code regions
+    - This *did not* require writing a custom parser.
+
+![Screenshot of Joplin's beta editor. Math has highlighting, as do block quotes, bolded/italicized text]({{ assets_dir | append: 'better-syntax-highlighting.png' | relative_url }})
+
+
+{% comment %}
 ### Bug #1: Keyboard overlaps toolbar on iOS
-[Pull request](https://github.com/laurent22/joplin/pull/6823)
 
 On iOS, React Native's `KeyboardAvoidingView` can sometimes compensate too much or too little for the keyboard. As such, the keyboard partially covered the toolbar on some devices.
 
@@ -116,9 +134,6 @@ Initially, I only tested the markdown toolbar on one iOS device (I _did_ test it
 After the markdown toolbar, and thus this workaround, was merged, I tested the app on a different iOS device and noticed the issue mentioned above. The fix for this other set of iOS devices was to add a button beneath the toolbar. If this button is visible, the user is on a device where space needs to be removed beneath the toolbar. Otherwise, the button is invisible.
 
 I quite dislike this fix.
-
-
-{% comment %}
 To-do:
 # Other bugs I worked on, but didn't fix
  - Keyboard light in dark mode on iOS
