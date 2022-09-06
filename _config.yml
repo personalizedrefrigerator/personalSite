@@ -55,6 +55,7 @@ plugins:
 
 permalink: pretty
 
+favicon_url_absolute: /main/favicon.png
 hematite:
   auto_invert_imgs: true
 
