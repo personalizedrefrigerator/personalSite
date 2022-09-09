@@ -20,7 +20,7 @@ tags: gsoc joplin
 # The image editor/freehand drawing widget
 [js-draw on NPM][js-draw-npm] | [Joplin Plugin][js-draw-plugin]
 
-While creating my GSoC proposal, I decided to divide my summer into two sub-projects: building a markdown toolbar for Joplin's mobile app and creating an image editor for both the mobile and desktop apps.
+While creating my GSoC proposal, I decided to spend my summer working on two sub-projects: building a markdown toolbar for Joplin's mobile app and creating an image editor for both the mobile and desktop apps.
 
 While `js-draw` hasn't yet been added to the mobile app, I've [added it to the desktop app through a plugin][js-draw-plugin].
 
@@ -35,6 +35,19 @@ Before making `js-draw` its own project, I created [a pull request adding the im
 
 Try `js-draw` below!
 <script src="https://cdn.jsdelivr.net/npm/js-draw@0.1.10/dist/bundle.js" integrity="sha256-es3CO1AseW9wAb9mNDfjEhUWKNZncCRoYMTdpw2t2VI=" crossorigin="anonymous"></script>
+<style>
+body {
+    --background-color-copy: var(--primary-background-color);
+}
+.imageEditorContainer {
+    --primary-background-color: var(--background-color-copy);
+    --primary-background-color-transparent: var(--primary-background-color);
+    --secondary-background-color: var(--selected-item-bg-color);
+    --primary-foreground-color: var(--primary-text-color);
+    --secondary-foreground-color: var(--selected-item-fg-color);
+    --primary-shadow-color: var(--shadow-color-light);
+}
+</style>
 <script>
     // Adds a save action to a js-draw editor's toolbar.
     function addSaveAction(editor, toolbar) {
