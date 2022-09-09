@@ -1,6 +1,7 @@
 ---
 layout: post
 title:  "Final Reflection — Google Summer of Code"
+description: Reflection on the creation of js-draw (an image editor) and a markdown toolbar as a part of Google Summer of Code.
 katex: true
 tags: gsoc joplin
 ---
@@ -8,7 +9,7 @@ tags: gsoc joplin
 {% assign assets_dir = '/assets/img/posts/2022-09-05-gsoc-final-reflection/' %}
 
 <!-- Relevant links -->
-[Weekly status updates][weekly-status-updates] | [GSoC project page][gsoc-project-page] | [GSoC pull requests][gsoc-pull-requests]
+[Weekly status updates][weekly-status-updates] | [GSoC project page][gsoc-project-page] | [List of GSoC pull requests][gsoc-pull-requests]
 
 # Goals
  - [x] Create a markdown toolbar
@@ -34,7 +35,7 @@ Before making `js-draw` its own project, I created [a pull request adding the im
 </aside>
 
 Try `js-draw` below!
-<script src="https://cdn.jsdelivr.net/npm/js-draw@0.1.10/dist/bundle.js" integrity="sha256-es3CO1AseW9wAb9mNDfjEhUWKNZncCRoYMTdpw2t2VI=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-draw@0.1.11/dist/bundle.js" integrity="sha256-iPZKyvjY3FNb2NvJesDQPye7tfrc6kOR2ezQg7+SvgI=" crossorigin="anonymous"></script>
 <style>
 body {
     --background-color-copy: var(--primary-background-color);
