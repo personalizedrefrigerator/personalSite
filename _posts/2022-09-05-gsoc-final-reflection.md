@@ -91,14 +91,14 @@ body {
 </script>
 
 ## Features
- * Zoom levels from $$\leq 1\cdot 10^{-6}$$ to $$\geq 1\cdot 10^6$$ times.
+ * Zoom levels from $$2\cdot 10^{-10}$$x to $$1 \cdot 10^{12}$$x.
  * Keyboard shortcuts:
     * `h`, `j`, `k`, `l`, `a`, `d`, and arrow keys move the view.
     * `w` and `s` zoom the view in/out.
     * `ctrl+z`, `ctrl+Shift+Z`: undo and redo.
  * Bézier curve fitting:
     * Strokes are converted into Bézier curves
-      * <div id='jsDrawDemo-2'></div>
+    * <div id='jsDrawDemo-2'></div>
     * This uses [bezier-js](https://www.npmjs.com/package/bezier-js) for projecting points onto Bézier curves, finding normals, and Bézier curve intersection testing.
 
 <script>
@@ -127,12 +127,11 @@ The markdown toolbar is a feature added to Joplin's (beta) mobile editor. It all
 ## What's done
  - Find and replace tool
     - [x] Implemented and merged
- - Markdown commands
+ - Markdown commands (merged and implemented)
     - [x] Bold, italicize, toggle code region, toggle $$\TeX$$ region, toggle header
     - [x] Edit/insert link
  - Markdown toolbar
     - [x] Implemented and merged
- - CodeMirror GUI
 
 ## Bugs and what isn't done
  - [ ] On iOS, the keyboard for the markdown editor is always in light mode
@@ -140,9 +139,11 @@ The markdown toolbar is a feature added to Joplin's (beta) mobile editor. It all
     - [Joplin issue tracker](https://github.com/laurent22/joplin/issues/5775)
 
 # Better markdown syntax highlighting
+[Relevant pull request (merged)][markdown-syntax-highlight-pr]
 
 - [x] Added syntax highlighting for math ($$\KaTeX$$) regions in the CodeMirror 6 editor.
     - This involved writing a custom CodeMirror parser to recognize regions surrounded by `$`s and `$$`s.
+    - This functionality supports the markdown toolbar — the markdown toolbar uses CodeMirror's syntax tree to determine the bounds of regions like math and code. As such, moving the cursor within a math region and clicking the "toggle math" button on the markdown toolbar can toggle an entire math region.
 - [x] Added syntax highlighting for fenced code regions
     - This *did not* require writing a custom parser.
 
@@ -166,8 +167,20 @@ To-do:
  - Android: Worked around a bug in CodeMirror and selecting text
 {% endcomment %}
 
+# Reflection
+
+I accomplished my major goals for this summer's GSoC project: I created a markdown toolbar for the mobile app and an image editor (with zoom from $$2\cdot 10^{-10}$$ to $$1 \cdot 10^{12}$$ times zoom!).
+
+More time was spent revising code and responding to feedback than expected. For example, although I had a draft of the markdown toolbar created and ready (in my mind) to merge in the first few weeks of the program, it took a significant amount of refactoring, revising, and breaking my work into smaller pull requests to get the markdown toolbar merged into Joplin. If I apply for GSoC again, I will schedule more time for responding to feedback.
+
+Additionally frustrating were several bugs in React Native, including its [vanishing `KeyboardAvoidingView`](https://github.com/laurent22/joplin/issues/6682#issuecomment-1207123165), [improperly-sized `KeyboardAvoidingView`](https://github.com/laurent22/joplin/issues/6805), and [`react-native-webview`'s lack of support for dark-mode keyboards on iOS](https://github.com/react-native-webview/react-native-webview/issues/1634). While some of the issues related to the vanishing `KeyboardAvoidingView` have been fixed upstream, as of the time of this writing, many of these issues remain unsolved. Fixes may require pull requests to the upstream projects.
+
+Even with the above challenges, I consider this summer's GSoC project successful.
+
+
 [markdown-commands-pr]: https://github.com/laurent22/joplin/pull/6707
 [markdown-toolbar-ui-pr]: https://github.com/laurent22/joplin/pull/6753
+[markdown-syntax-highlight-pr]: https://github.com/laurent22/joplin/pull/6684
 [js-draw-npm]: https://www.npmjs.com/package/js-draw
 [js-draw-plugin]: https://discourse.joplinapp.org/t/plugin-js-draw-integration/27114
 [gsoc-project-page]: https://summerofcode.withgoogle.com/proposals/details/kkfqMKMK
