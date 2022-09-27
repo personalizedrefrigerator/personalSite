@@ -3,7 +3,7 @@ layout: post
 title:  "Final Reflection — Google Summer of Code"
 description: Reflection on the creation of js-draw (an image editor) and a markdown toolbar as a part of Google Summer of Code.
 katex: true
-tags: gsoc joplin
+tags: gsoc joplin projects
 ---
 
 {% assign assets_dir = '/assets/img/posts/2022-09-05-gsoc-final-reflection/' %}
