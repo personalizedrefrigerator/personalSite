@@ -22,7 +22,11 @@ title: Henry Heino
 email: henryuheino@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   Posts, articles, and other things I use a website for!
-baseurl: "/personalSite" # the subpath of your site, e.g. /blog
+
+# the subpath of your site, e.g. /blog
+# Note that all occurences of /personalSite should be preceeded by a quotation mark.
+# See scripts/build-ci.sh.
+baseurl: "/personalSite"
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  personalizedrefrigerator
 
@@ -55,7 +59,7 @@ plugins:
 
 permalink: pretty
 
-favicon_url_absolute: /personalSite/favicon.png
+favicon_url_absolute: "/personalSite/favicon.png"
 hematite:
   auto_invert_imgs: false
 
