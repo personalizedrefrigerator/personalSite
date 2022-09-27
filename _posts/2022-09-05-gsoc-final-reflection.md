@@ -195,6 +195,6 @@ Even with the above challenges, I consider this summer's GSoC project successful
 [markdown-syntax-highlight-pr]: https://github.com/laurent22/joplin/pull/6684
 [js-draw-npm]: https://www.npmjs.com/package/js-draw
 [js-draw-plugin]: https://discourse.joplinapp.org/t/plugin-js-draw-integration/27114
-[gsoc-project-page]: https://summerofcode.withgoogle.com/proposals/details/kkfqMKMK
+[gsoc-project-page]: https://summerofcode.withgoogle.com/programs/2022/projects/RCS4HdVg
 [weekly-status-updates]: https://discourse.joplinapp.org/tags/c/gsoc-projects/mobile-editor-improvements/29/report
 [gsoc-pull-requests]: https://github.com/laurent22/joplin/pulls?q=is%3Apr+author%3Apersonalizedrefrigerator++created%3A%3C2022-09-08
