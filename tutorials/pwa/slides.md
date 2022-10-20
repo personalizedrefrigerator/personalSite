@@ -1,0 +1,707 @@
+---
+layout: remark_slideshow
+title:  "Progressive Web App Tutorial"
+description: Work-in-progress tutorial on the basics of progressive web apps (and HTML).
+katex: true
+---
+
+{% assign imgs_dir = "/tutorials/pwa/imgs" | relative_url %}
+
+<style>
+.left-column70 {
+    width: 70%;
+    float: left;
+}
+.right-column30 {
+    width: 30%;
+    float: right;
+}
+.left-column50 {
+    width: 50%;
+    float: left;
+}
+.right-column49 {
+    width: 49%;
+    float: right;
+}
+code {
+    border: 1px solid lightgray;
+    border-radius: 2px;
+}
+</style>
+
+<div markdown=0>
+
+# Agenda
+ * Learn what a PWA is.
+ * *Quick* introduction to HTML/CSS.
+ * What does it take to make a web app installable?
+ * iOS-specific configuration.
+ * Showing a notification.
+
+{% comment %}
+---
+
+# What is a progressive web app (PWA)?
+
+.left-column70[
+According to [MDN](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps),
+> Progressive Web Apps (PWAs) are web apps that use service workers, manifests, and other web-platform features in combination with progressive enhancement to give users an experience on par with native apps.
+>
+> <cite>— Mozilla Developer Networks</cite>
+
+In short, PWAs are websites that act like native apps (e.g. are installable, display notifications, etc.), *while still working properly on browsers that don't support newer PWA features*.
+]
+
+.right-column30[![Drawing of a phone with a notification and an 'install me' popup]({{ imgs_dir }}/pwa_justinstalled.svg)]
+
+{%endcomment%}
+
+---
+
+# What is a progressive web app (PWA)?
+
+.left-column70[
+- Installable ![Download icon]({{imgs_dir}}/download_icon.svg)
+- Looks/acts like a native app <img src="{{imgs_dir}}/pwa_notoolbar.svg" alt="Phone OS toolbar with arrow pointing that says 'no browser toolbar'" height="58px"/>
+- Can also be used like a traditional website in older browsers ![Logo of an older browser]({{imgs_dir}}/old_browser_logo.svg)
+]
+
+.right-column30[![Drawing of a phone with a notification and an 'install me' popup]({{ imgs_dir }}/pwa_justinstalled.svg)]
+
+???
+
+Definition source: [MDN](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
+
+---
+
+<img alt="A screenshot of an example progressive web app" src="{{imgs_dir}}/example-pwa.svg" style="max-height: 600px;"/>
+
+---
+
+# HTML
+
+(Be sure to collect an HTML and JavaScript "cheat sheet" if you haven't already!)
+
+- Determines a website's content (and behavior, to a degree.)
+- Containers are called tags and look like this `<p>Content of the paragraph container.</p>`.
+- Content inside of the `<head></head>` container generally determines website behavior/display.
+
+.center[![]({{imgs_dir}}/html.svg)]
+
+???
+
+Participants should be given a "cheat-sheet" with HTML syntax.
+
+---
+
+# HTML — Examples
+
+.left-column50[
+Example 1:
+```html
+<!DOCTYPE html>
+<html>
+    <head><title>The website's title</title></head>
+    <body>
+        <p>This is a paragraph.</p>
+    </body>
+</html>
+```
+]
+
+.right-column49[
+Example 2:
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>The website's title</title>
+        <script>
+            if (Math.random() > 0.5) {
+                alert('Show an alert box');
+            }
+        </script>
+    </head>
+    <body>
+        <p>This is a paragraph.</p>
+        <button>This is a button</button>
+    </body>
+</html>
+```
+]
+
+Questions?
+
+---
+{% capture css_header %}<span style="font-family: 'Tex Gyre Bonum', serif; font-weight: bold;">C</span><span style="font-family: 'Tex Gyre Adventor', sans; transform: scale(0.9, 1) rotate(6deg); display: inline-block;">S</span>S{%endcapture%}
+# {{css_header}}
+
+ * Changes how things on a website look.
+ * Decides what to style based on *tags*.
+
+.left-column50[
+**Example 1**:
+```html
+<!DOCTYPE html>
+<html>
+    <body>
+        <p>A paragraph</p>
+        <style>
+            p {
+                color: red;
+            }
+        </style>
+    </body>
+</html>
+```
+]
+.right-column49[
+**Example 2**:
+```html
+<!DOCTYPE html>
+<html>
+    <body>
+        <p class='a-paragraph'>A paragraph</p>
+        <style>
+            .a-paragraph {
+                color: red;
+            }
+        </style>
+    </body>
+</html>
+```
+]
+
+---
+# {{css_header}}
+
+**Example 3**:
+```html
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1 class='css-header'>
+            <span class='c'>C</span><span class='s1'>S</span><span class='s2'>S</span>
+        </h1>
+        <style>
+            .css-header > .c {
+                font-family: serif;
+                font-weight: bold;
+            }
+            .css-header > .s1 {
+                font-family: sans;
+
+                transform: scale(0.9, 1) rotate(6deg);
+
+                /* inline-block turns off text wrapping — the browser can't transform text that could wrap between lines. */
+                display: inline-block;
+            }
+        </style>
+    </body>
+</html>
+```
+
+
+---
+# JavaScript
+
+ - Website _behavior_.
+ - We want to be able to import other scripts, so will be using [module scripts](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) (scripts with imports).
+
+**index.html**:
+```html
+<!DOCTYPE html>
+<html>
+    <body>
+        <div>
+            <span id='counter'></span>
+            <button id='add-to-counter'>+</button>
+        </div>
+    </body>
+
+    <!-- Include a script from a file. -->
+    <script src='counter.js'></script>
+</html>
+```
+
+---
+
+**counter.js**:
+```js
+const counterDisplay = document.querySelector(`#counter`);
+const incrementButton = document.querySelector(`#add-to-counter`);
+
+const initialCounterValue = 0
+counterDisplay.innerText = initialCounterValue;
+
+incrementButton.onclick = () => {
+    const previousValue = parseInt(counterDisplay.innerText);
+    const newValue = previousValue + 1;
+    counterDisplay.innerText = newValue;
+};
+```
+
+![The counter running in a webbrowser. The count is displayed and a plus button displays to the right.]({{ imgs_dir }}/counter-display.png)
+
+---
+
+# Let's make the counter value persistent!
+
+**counter.js**:
+```js
+const counterDisplay = document.querySelector(`#counter`);
+const incrementButton = document.querySelector(`#add-to-counter`);
+
+// ?? <- if the thing on the left is undefined or null, return the thing on the right.
+// E.g. 3 ?? 6 == 3, but null ?? 6 == 6.
+const initialCounterValue = localStorage.getItem('counter-value') ?? '0';
+counterDisplay.innerText = initialCounterValue;
+
+incrementButton.onclick = () => {
+    const previousValue = parseInt(counterDisplay.innerText);
+    const newValue = previousValue + 1;
+    counterDisplay.innerText = newValue;
+
+    localStorage.setItem('counter-value', newValue);
+};
+```
+
+???
+
+Above, we use `localStorage.getItem` and `localStorage.setItem` to persistently store the counter's value.
+Read more about these functions on [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
+
+If you want to share information between users of the app, consider using a service like [Firebase Firestore](https://firebase.google.com/docs/web/setup).
+
+---
+
+# Let's give it an icon!
+
+<img src="{{ imgs_dir }}/counter-icon.svg" alt="Counter icon" style="background-color: black; padding: 8px; border-radius: 6px; max-width: 400px; border: 1px solid black;"/>
+
+Make an SVG image (or use this one) and save it as `icon.svg`.
+
+???
+
+Here's an SVG icon I made with `js-draw` (an online drawing program). To make a more professional icon, I suggest a tool like [Inkscape](https://inkscape.org/).
+
+---
+
+Depending on how you make the SVG image, you may need to manually adjust the height/width. We want `height=512` and `width=512`.
+<img src="{{imgs_dir}}/editing-height-width.png" alt="Image open in ViM, height and width changed and highlighted" style='max-width: 100%; margin-top: 100px;'/>
+
+???
+
+You might need to change the image width/height depending on how you made it &mdash; we'll need it to be a square of a specific size.
+
+---
+
+# Adding the icon
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Counter</title>
+
+        <!-- Set the icon! -->
+        <link rel='icon' href='./icon.svg'/>
+
+        <meta charset='utf-8'/>
+    </head>
+    <body>
+        <div>
+            <span id='counter'></span>
+            <button id='add-to-counter'>+</button>
+        </div>
+    </body>
+
+    <script src='counter.js'></script>
+</html>
+```
+
+---
+
+<img src="{{imgs_dir}}/counter-window-with-icon.png" alt="counter window with the icon showing up in the titlebar!"/>
+
+---
+
+# Let's test on mobile!
+
+![]({{imgs_dir}}/very-small-on-mobile.png)
+
+Why is everything so small???
+
+---
+
+# Making the UI scale properly
+
+**index.html**:
+```html
+<!DOCTYPE html>
+<html>
+    <html>
+    <head>
+        <link rel='icon' href='./icon.svg'/>
+        <meta charset='utf-8'/>
+        <title>Counter</title>
+
+        <!-- Set the window's width to the device-width to prevent the UI from being small! -->
+        <meta name='viewport' content='width=device-width'/>
+    </head>
+    <body>
+        <div><span id='counter'></span><button id='add-to-counter'>+</button></div>
+    </body>
+    <script src='counter.js'></script>
+</html>
+```
+
+We need to set the viewport!
+
+---
+
+# Making the UI scale properly
+
+**index.html**:
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel='icon' href='./icon.svg'/>
+        <meta charset='utf-8'/>
+        <title>Counter</title>
+
+        <!-- Set the window's width to the device-width to prevent the UI from being small! -->
+        <meta name='viewport' content='width=device-width,initial-scale=1.0'/>
+    </head>
+    <body>
+        <div><span id='counter'></span><button id='add-to-counter'>+</button></div>
+    </body>
+    <script src='counter.js'></script>
+</html>
+```
+
+Let's also disable pinch zooming and ensure the zoom starts at the correct level when rotating the screen.
+
+???
+
+Adding `initial-scale=1.0` [works around an iPhone zoom-on-screen-rotate bug](https://css-tricks.com/probably-use-initial-scale1/) and perhaps other issues.
+
+<!--
+
+Why isn't there an icon when we add it to the homescreen on an iOS device?
+
+==TODO==
+
+-->
+
+---
+
+# Let's make it installable!
+
+To do this, we need to add a web app manifest and a service worker. Let's start with the manifest:
+
+**manifest.json**:
+```json
+{
+    "short_name": "Counter",
+    "name": "Counter App",
+    "icons": [
+        {
+            "src": "./icon.svg",
+            "type": "image/svg+xml",
+            "sizes": "512x512"
+        }
+    ],
+    "start_url": "./index.html",
+    "background_color": "#ccaa00",
+    "theme_color": "purple",
+
+    "display": "standalone"
+}
+```
+
+???
+
+https://web.dev/add-manifest/
+
+Adding 
+```json
+    "purpose": "any maskable"
+```
+to the icon allows Android devices to display it over a custom background. 
+See also [this web.dev article](https://web.dev/add-manifest/#icons).
+
+---
+
+Now, let's make it possible for the browser to find the manifest. Add `<link rel="manifest" href="./manifest.json"/>` to `index.html`.
+
+**index.html**:
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel='manifest' href='./manifest.json'/>
+
+        <meta charset='utf-8'/>
+        <meta name='viewport' content='width=device-width,initial-scale=1.0,user-scalable=no'/>
+        <link rel='icon' href='./icon.svg'/>
+
+        <title>Counter</title>
+    </head>
+    <body>
+        <div><span id='counter'></span><button id='add-to-counter'>+</button></div>
+    </body>
+    <script src='counter.js'></script>
+</html>
+```
+
+---
+
+# Let's run it through Lighthouse.
+
+<img alt="Lighthouse start tab in Microsoft Edge developer tools. All checkboxes except for PWA, navigation (timespan) and Mobile, are unchecked." src="{{imgs_dir}}/lighthouse-pwa-check-1.png" style='max-height: 560px;'/>
+
+???
+
+Lighthouse is available in most (all?) Chromium-based desktop browsers. Above, it's shown in Microsoft Edge.
+
+---
+
+# Let's run it through Lighthouse.
+
+<img alt="Lighthouse check results: Our app isn't installable yet -- it needs a service worker" src="{{imgs_dir}}/lighthouse-pwa-check-2.png" style='max-height: 560px;'/>
+
+
+---
+
+# Let's run it through Lighthouse.
+
+<img alt="Expanding the box that lists the reason for not being installable: No matching service worker detected. You may need to reload the page, or check that the scope of the service worker for the current page encloses the scope and start URL from the manifest." src="{{imgs_dir}}/lighthouse-pwa-check-3.png" style='max-height: 560px;'/>
+
+---
+
+# Adding a service worker
+
+**sw.js**
+```js
+const cacheName = 'v1';
+
+const fetchOrGetFromCache = async (event) => {
+    const cache = await caches.open(cacheName);
+    try {
+        const fetched = await fetch(event.request.url);
+        cache.put(event.request, fetched.clone());
+
+        return fetched;
+    } catch (error) {
+        console.warn('Unable to fetch from the internet. Error: ', error);
+        return cache.match(event.request.url);
+    }
+};
+
+self.addEventListener('fetch', event => {
+	event.respondWith(fetchOrGetFromCache(event));
+});
+```
+
+???
+
+This service worker is largely taken from [js-draw](https://github.com/personalizedrefrigerator/js-draw/blob/main/docs/example/sw.js).
+
+# See also
+ - [MDN: CacheStorage#open](https://developer.mozilla.org/en-US/docs/Web/API/CacheStorage/open)
+ - [More on caching with Service Workers](https://web.dev/service-worker-caching-and-http-caching/)
+ - Workbox: A service worker library: [Service worker documentation](https://developer.chrome.com/docs/workbox/caching-strategies-overview/)
+
+---
+
+# Breaking down the service worker
+
+```js
+// A unique name for the cache we're using. 
+const cacheName = 'counterCache-v1';
+
+const fetchOrGetFromCache = async (event) => {
+    const cache = await caches.open(cacheName);
+    try {
+        const fetched = await fetch(event.request.url);
+        cache.put(event.request, fetched.clone());
+
+        return fetched;
+    } catch (error) {
+        console.warn('Unable to fetch from the internet. Error: ', error);
+        return cache.match(event.request.url);
+    }
+};
+
+self.addEventListener('fetch', event => {
+	event.respondWith(fetchOrGetFromCache(event));
+});
+```
+
+---
+
+# Breaking down the service worker
+
+```js
+const cacheName = 'counterCache-v1';
+
+const fetchOrGetFromCache = async (event) => {
+    const cache = await caches.open(cacheName);
+    try {
+        const fetched = await fetch(event.request.url);
+        cache.put(event.request, fetched.clone());
+
+        return fetched;
+    } catch (error) {
+        console.warn('Unable to fetch from the internet. Error: ', error);
+        return cache.match(event.request.url);
+    }
+};
+
+const onFetch = (event) => {
+	event.respondWith(fetchOrGetFromCache(event));
+};
+// Call onFetch when the browser tries to load a resource (e.g an image,
+// a script, index.html, etc.)
+self.addEventListener('fetch', onFetch);
+```
+
+---
+
+# Breaking down the service worker
+
+```js
+// A unique name for the cache we're using. 
+const cacheName = 'counterCache-v1';
+
+// async: Return something that we can wait for.
+// i.e. await fetchOrGetFromCache(evt) **waits**
+//      for fetchOrGetFromCache to finish while
+//      fetchOrGetFromCache(evt) with no await does not.
+const fetchOrGetFromCache = async (event) => {
+    const cache = await caches.open(cacheName);
+    try {
+        const fetched = await fetch(event.request.url);
+        cache.put(event.request, fetched.clone());
+
+        return fetched;
+    } catch (error) {
+        console.warn('Unable to fetch from the internet. Error: ', error);
+        return cache.match(event.request.url);
+    }
+};
+
+self.addEventListener('fetch', event => {
+	event.respondWith(fetchOrGetFromCache(event));
+});
+```
+
+
+---
+
+# Breaking down the service worker
+
+```js
+// A unique name for the cache we're using. 
+const cacheName = 'counterCache-v1';
+
+const fetchOrGetFromCache = async (event) => {
+    // await: Wait for caches.open to finish. Open our cache.
+    const cache = await caches.open(cacheName);
+    try {
+        // fetch: Get the contents of the URL from the internet
+        const fetched = await fetch(event.request.url);
+        cache.put(event.request, fetched.clone());
+
+        return fetched;
+    } catch (error) {
+        console.warn('Unable to fetch from the internet. Error: ', error);
+        return cache.match(event.request.url);
+    }
+};
+
+self.addEventListener('fetch', event => {
+	event.respondWith(fetchOrGetFromCache(event));
+});
+```
+
+---
+
+# Registering the service worker
+
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+        ...
+    </head>
+    <body>
+        <div><span id='counter'></span><button id='add-to-counter'>+</button></div>
+    </body>
+    <script src='counter.js'></script>
+
+    <!-- Register the service worker -->
+    <script>
+        const pathToServiceWorker = './sw.js';
+        navigator.serviceWorker.register(pathToServiceWorker).catch(err => {
+            console.error('Unable to register service worker:', err);
+        });
+    </script>
+</html>
+```
+
+---
+
+# Error handling
+
+`navigator.serviceWorker` can be `null` on older browsers. Let's try to handle that!
+
+```html
+<script>
+    if (navigator.serviceWorker) {
+        navigator.serviceWorker.register('./sw.js').catch(err => {
+            console.error('Unable to register service worker:', err);
+        });
+    }
+</script>
+```
+
+???
+
+Alternatively, using JavaScript `?` syntax,
+
+```js
+<script>
+    navigator.serviceWorker?.register('./sw.js')?.catch(err => {
+        console.error('Unable to register service worker:', err);
+    });
+</script>
+```
+
+A `?` means "don't call the method if the left side of `?` is `null` or `undefined`". For example, `(null)?.foo()` does nothing.
+
+---
+
+# Installing it!
+
+![Click the icon in the browser toolbar!]({{imgs_dir}}/install-counter-app.png)
+
+???
+
+Not all browsers support PWA installation. Firefox, for example, does not.
+
+---
+
+# Running the PWA check again...
+
+We need special `PNG` icons!
+
+<img alt="Lighthouse: There are still issues" src="{{imgs_dir}}/lighthouse-pwa-check-1.png" style='max-height: 560px;'/>
+
+---
+
+# 
+
+</div>
