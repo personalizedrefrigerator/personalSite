@@ -37,7 +37,6 @@ code {
  * *Quick* introduction to HTML/CSS.
  * What does it take to make a web app installable?
  * iOS-specific configuration.
- * Showing a notification.
 
 {% comment %}
 ---
@@ -686,7 +685,7 @@ A `?` means "don't call the method if the left side of `?` is `null` or `undefin
 
 # Installing it!
 
-![Click the icon in the browser toolbar!]({{imgs_dir}}/install-counter-app.png)
+<img alt="Click the icon in the browser toolbar to install the app." src="{{imgs_dir}}/install-counter-app.png" style="width: 98%;"/>
 
 ???
 
@@ -702,6 +701,53 @@ We need special `PNG` icons!
 
 ---
 
-# 
+# PNG icons and iOS fixes
+
+Create a 192-px PNG icon for the app and add it to the main HTML file.
+
+**index.html**:
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel='apple-touch-icon' href='./icon-192.png'/>
+        <meta name='theme-color' content='#ff0000'/>
+
+        <link rel='manifest' href='./manifest.json'/>
+        <meta charset='utf-8'/>
+        <meta name='viewport' content='width=device-width,initial-scale=1.0,user-scalable=no'/>
+        <link rel='icon' href='./icon.svg'/>
+
+        <title>Counter</title>
+    </head>
+    <body>
+        <div><span id='counter'></span><button id='add-to-counter'>+</button></div>
+    </body>
+    <script src='counter.js'></script>
+</html>
+```
+---
+
+# How do I install a PWA on iOS?
+
+Share sheet -> Add to homescreen
+
+<img alt="" src="{{imgs_dir}}/ios-install-from-share-sheet-1.png" width='300px'/>
+<img alt="" src="{{imgs_dir}}/ios-install-from-share-sheet-2.png" width='300px'/>
+
+---
+
+# Questions?
+
+---
+
+# From here:
+
+- [Triggering a notification with the push API](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Re-engageable_Notifications_Push)
+- [Material UI --- Making the app look like a native app](https://m2.material.io/components/app-bars-top/web#using-the-top-app-bar)
+
+???
+
+To-do: [Notifications](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Re-engageable_Notifications_Push)
 
 </div>
