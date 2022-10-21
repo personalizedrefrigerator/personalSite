@@ -741,6 +741,97 @@ Share sheet -> Add to homescreen
 
 ---
 
+# Making it look like a native app
+
+We can either,
+1. Use CSS to make the app look like a native Android/iOS/Windows/etc. app.
+2. Use a library that does some of this for us.
+
+???
+
+For now, we're going to select option 2.
+
+---
+
+# Making it look like a native app
+
+[Google's Material Design website](https://m2.material.io) suggests using [material-components-web](https://github.com/material-components/material-components-web/blob/master/docs/getting-started.md#quick-start-cdn). Let's do that:
+**index.html**:
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/material-components-web@14.0.0/dist/material-components-web.min.css" integrity="sha256-YPguGDqg55HB8+tbrJBbWuiF9J+XCK7sjscaiwFMTxI=" crossorigin="anonymous"/>
+        <script src="https://cdn.jsdelivr.net/npm/material-components-web@14.0.0/dist/material-components-web.min.js" integrity="sha256-8DHMt+TYs1kVcO+R+oZYTrHYIYwHUOChiQsqKb2BT3g=" crossorigin="anonymous"></script>
+
+        <title>Counter</title>
+        ...
+    </head>
+    <body>
+        <div>
+            <span id='counter'></span>
+            <button id='add-to-counter'>+</button>
+        </div>
+    </body>
+    ...
+</html>
+```
+
+???
+
+Getting the package's subresource integrity check: [Visit the library's page on JSDelivr](https://www.jsdelivr.com/package/npm/material-components-web), then use the "show and configure all links button".
+
+
+---
+
+# Make the button a floating action button
+
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+        ...
+
+        <title>Counter</title>
+        ...
+    </head>
+    <body>
+        <div>
+            <span id='counter'></span>
+        </div>
+
+        <div class='mdc-touch-target-wrapper'>
+            <button
+                id='add-to-counter'
+                class='mdc-fab mdc-fab--mini mdc-fab--touch'
+            >
+                <div class='mdc-fab__ripple'></div>
+                <span class='mdc-fab__icon'>+</span>
+                <div class='mdc-fab__touch'></div>
+            </button>
+        </div>
+    </body>
+    ...
+</html>
+```
+
+**in counter.js**:
+```js
+...
+
+mdc.ripple.MDCRipple.attachTo(incrementButton);
+```
+
+???
+
+Ref https://m2.material.io/components/buttons-floating-action-button/web#regular-fabs
+
+---
+# Live coding: Fixing the button
+
+
+---
+
 # From here:
 
 - [Triggering a notification with the push API](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Re-engageable_Notifications_Push)
