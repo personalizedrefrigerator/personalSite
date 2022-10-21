@@ -11,6 +11,7 @@ katex: true
 </script>
 
 {% assign imgs_dir = "/tutorials/pwa/imgs" | relative_url %}
+{% assign csdir = "/tutorials/pwa/cheatsheet" | relative_url %}
 
 <style>
 .left-column70 {
@@ -36,6 +37,14 @@ code {
 </style>
 
 <div markdown=0>
+
+# Reference sheets
+- [web manifest]({{csdir}}/web.pdf)
+- [HTML]({{csdir}}/html.pdf)
+- [JavaScript]({{csdir}}/js.pdf)
+- [CSS]({{csdir}}/css.pdf)
+
+---
 
 # Plan
  * Slides (30-45 mins)
