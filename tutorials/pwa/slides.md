@@ -443,7 +443,7 @@ Now, let's make it possible for the browser to find the manifest. Add `<link rel
         <link rel='manifest' href='./manifest.json'/>
 
         <meta charset='utf-8'/>
-        <meta name='viewport' content='width=device-width,initial-scale=1.0,user-scalable=no'/>
+        <meta name='viewport' content='width=device-width,initial-scale=1.0'/>
         <link rel='icon' href='./icon.svg'/>
 
         <title>Counter</title>
@@ -697,7 +697,7 @@ Not all browsers support PWA installation. Firefox, for example, does not.
 
 We need special `PNG` icons!
 
-<img alt="Lighthouse: There are still issues" src="{{imgs_dir}}/lighthouse-pwa-check-1.png" style='max-height: 560px;'/>
+<img alt="Lighthouse: There are still issues" src="{{imgs_dir}}/lighthouse-pwa-check-4.png" style='max-height: 560px;'/>
 
 ---
 
@@ -715,7 +715,7 @@ Create a 192-px PNG icon for the app and add it to the main HTML file.
 
         <link rel='manifest' href='./manifest.json'/>
         <meta charset='utf-8'/>
-        <meta name='viewport' content='width=device-width,initial-scale=1.0,user-scalable=no'/>
+        <meta name='viewport' content='width=device-width,initial-scale=1.0'/>
         <link rel='icon' href='./icon.svg'/>
 
         <title>Counter</title>
@@ -826,7 +826,11 @@ mdc.ripple.MDCRipple.attachTo(incrementButton);
 
 Ref https://m2.material.io/components/buttons-floating-action-button/web#regular-fabs
 
+There's an issue with the button still:
+![button isn't near the bottom right corner of the screen]({{imgs_dir}}/add-button-in-wrong-place.png)
+
 ---
+
 # Live coding: Fixing the button
 
 
@@ -834,8 +838,14 @@ Ref https://m2.material.io/components/buttons-floating-action-button/web#regular
 
 # From here:
 
-- [Triggering a notification with the push API](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Re-engageable_Notifications_Push)
-- [Material UI --- Making the app look like a native app](https://m2.material.io/components/app-bars-top/web#using-the-top-app-bar)
+## Mobile-like sidebar, pushbuttons, etc.
+- [Material UI --- Library to make things look like a mobile app](https://m2.material.io/components/app-bars-top/web#using-the-top-app-bar)
+
+## Notifications
+- [Triggering a notification with the push API](https://web.dev/notifications/)
+
+## Accelerometer
+- [Sensing: Accelerometer](https://developer.mozilla.org/en-US/docs/Web/API/Accelerometer), [Sensing: Accelerometer: iOS/Safari](https://kongmunist.medium.com/accessing-the-iphone-accelerometer-with-javascript-in-ios-14-and-13-e146d18bb175), [Getting accelerometer permissions in Safari/iOS](https://dev.to/li/how-to-requestpermission-for-devicemotion-and-deviceorientation-events-in-ios-13-46g2)
 
 ???
 
