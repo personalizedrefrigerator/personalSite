@@ -5,6 +5,11 @@ description: Work-in-progress tutorial on the basics of progressive web apps (an
 katex: true
 ---
 
+<script>
+    console.log('replacing...')
+    document.querySelectorAll('#long_title, #short_title').forEach(elem => elem.innerHTML = 'PWA Workshop');
+</script>
+
 {% assign imgs_dir = "/tutorials/pwa/imgs" | relative_url %}
 
 <style>
@@ -32,11 +37,16 @@ code {
 
 <div markdown=0>
 
-# Agenda
- * Learn what a PWA is.
- * *Quick* introduction to HTML/CSS.
- * What does it take to make a web app installable?
- * iOS-specific configuration.
+# Plan
+ * Slides (30-45 mins)
+    * Learn what a PWA is.
+    * *Quick* introduction to HTML/CSS.
+    * What does it take to make a web app installable?
+    * Making an example PWA
+ * Live coding (20-30 mins)
+    * Making the example app better.
+ * Work time and questions (30-40 mins)
+
 
 {% comment %}
 ---
@@ -132,12 +142,17 @@ Example 2:
 
 Questions?
 
+???
+Ask the room for volunteers &mdash; have someone walk through the HTML document based on the cheat sheet.
+If not, go through line-by-line.
+
 ---
 {% capture css_header %}<span style="font-family: 'Tex Gyre Bonum', serif; font-weight: bold;">C</span><span style="font-family: 'Tex Gyre Adventor', sans; transform: scale(0.9, 1) rotate(6deg); display: inline-block;">S</span>S{%endcapture%}
 # {{css_header}}
 
  * Changes how things on a website look.
- * Decides what to style based on *tags*.
+ * Decides what to style based on *selectors*.
+    * E.g. `p` selects all elements with tag `p` and `a-paragraph` selects all elements with class `a-paragraph`.
 
 .left-column50[
 **Example 1**:
@@ -206,7 +221,6 @@ Questions?
 # JavaScript
 
  - Website _behavior_.
- - We want to be able to import other scripts, so will be using [module scripts](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) (scripts with imports).
 
 **index.html**:
 ```html
@@ -223,6 +237,10 @@ Questions?
     <script src='counter.js'></script>
 </html>
 ```
+
+???
+ - If we want to be able to import other scripts, we can use [module scripts](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) (scripts with imports).
+ - We could also use a bundler like webpack or rollup.
 
 ---
 
@@ -241,7 +259,7 @@ incrementButton.onclick = () => {
 };
 ```
 
-![The counter running in a webbrowser. The count is displayed and a plus button displays to the right.]({{ imgs_dir }}/counter-display.png)
+![The counter running in a web-browser. The count is displayed and a plus button displays to the right.]({{ imgs_dir }}/counter-display.png)
 
 ---
 
