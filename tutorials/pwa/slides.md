@@ -38,6 +38,8 @@ code {
 
 <div markdown=0>
 
+[Video](https://drive.google.com/file/d/1e6rB68BcfTwERc0fVdlINDmL80Mo-OwA/view?usp=share_link)
+
 # Reference sheets
 - [web manifest]({{csdir}}/web.pdf)
 - [HTML]({{csdir}}/html.pdf)
