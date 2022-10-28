@@ -5,11 +5,6 @@ description: Work-in-progress tutorial on the basics of progressive web apps (an
 katex: true
 ---
 
-<script>
-    console.log('replacing...')
-    document.querySelectorAll('#long_title, #short_title').forEach(elem => elem.innerHTML = 'PWA Workshop');
-</script>
-
 {% assign imgs_dir = "/tutorials/pwa/imgs" | relative_url %}
 {% assign csdir = "/tutorials/pwa/cheatsheet" | relative_url %}
 
@@ -881,3 +876,8 @@ There's an issue with the button still:
 To-do: [Notifications](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Re-engageable_Notifications_Push)
 
 </div>
+
+<style onload="document.querySelectorAll('a').forEach(elem => elem.setAttribute('target', 'blank'));"></style>
+<script>
+    document.querySelectorAll('#long_title, #short_title').forEach(elem => elem.innerHTML = 'PWA Workshop');
+</script>
