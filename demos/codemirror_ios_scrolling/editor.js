@@ -5,7 +5,11 @@ const hugeDocLines = [
 ];
 
 for (let i = 0; i < 10_000; i++) {
-    hugeDocLines.push(`Line ${i}. It seems that lines may need to be long enough to wrap to trigger the bug. As such, each line is long.`);
+    hugeDocLines.push(
+        `Line ${i}. It seems that lines may need to be long enough to wrap to trigger the bug. ` + 
+        `As such, each line is long. Long enough to cause the line to wrap. ` +
+        `It seems that this might not be an issue on just iOS -- Firefox on Linux also seems to ` +
+        `have trouble when dragging the scroll bar.`);
 }
 
 const lineWrap = !location.href.endsWith('?no-wrap');
