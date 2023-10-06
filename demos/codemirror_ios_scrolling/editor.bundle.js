@@ -23257,16 +23257,21 @@
    ];
 
    for (let i = 0; i < 10_000; i++) {
-       hugeDocLines.push(`Line ${i}.`);
+       hugeDocLines.push(`Line ${i}. It seems that lines may need to be long enough to wrap to trigger the bug. As such, each line is long.`);
    }
+
+   const lineWrap = !location.href.endsWith('?no-wrap');
 
    new EditorView({
        doc: hugeDocLines.join('\n'),
        extensions: [
            basicSetup,
+
+           lineWrap ? EditorView.lineWrapping : [],
            EditorView.theme({
                '& .cm-scroller': {
-                   height: '80vh',
+                   height: '60vh',
+                   'overflow-y': 'auto',
                },
            }),
        ],
