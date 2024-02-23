@@ -1,0 +1,79 @@
+<!--
+	Open this file in a web browser to more easily debug the CodeMirror editor.
+	Messages will show up in the console when posted.
+-->
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+		<meta charset="utf-8"/>
+		<title>CodeMirror test</title>
+		<style>
+
+		</style>
+	</head>
+	<body>
+		<div class="CodeMirror"></div>
+		<script>
+			// Override the default postMessage — codeMirrorBundle expects
+			// this to be present.
+			window.ReactNativeWebView = {
+				postMessage: message => {
+					console.log('postMessage:', message);
+				},
+			};
+		</script>
+		<script src="./CodeMirror.bundle.js"></script>
+		<script>
+			const parent = document.querySelector('.CodeMirror');
+			const initialText = 'Testing...';
+
+			const settings = {
+				themeData: {
+					fontSize: 12, // px
+					fontFamily: 'serif',
+					backgroundColor: 'black',
+					color: 'white',
+					backgroundColor2: '#330',
+					color2: '#ff0',
+					backgroundColor3: '#404',
+					color3: '#f0f',
+					backgroundColor4: '#555',
+					color4: '#0ff',
+					appearance: 'dark',
+				},
+				themeId: 0,
+				spellcheckEnabled: true,
+				language: 'markdown',
+				katexEnabled: true,
+				useExternalSearch: false,
+				readOnly: false,
+
+				keymap: 'default',
+
+				automatchBraces: false,
+				ignoreModifiers: false,
+
+				indentWithTabs: false,
+			};
+
+			window.cm = codeMirrorBundle.initCodeMirror(parent, initialText, settings);
+		</script>
+
+		<!-- Details below added after build: -->
+		<details><summary>Build instructions & licensing</summary>
+			<p>This demo is licensed to you under the <a href="https://www.gnu.org/licenses/agpl-3.0.en.html">GNU AGPLv3.</a></p>
+
+			<p><b>Build instructions:</b></p>
+			<ol>
+				<li>
+					<a href="https://github.com/laurent22/joplin/blob/dd04a39f3b0add299adc0bf26e74c68813414ce3/readme/dev/BUILD.md?plain=1#L1">Build Joplin from source</a>
+					from <a href="https://github.com/personalizedrefrigerator/joplin/commits/work/fix-editor-in-old-browsers/">this branch</a>.</li>
+				<li>Checkout commit f20e6a3d84221321b25654bc0d86f656409fea4d and rebuild</li>
+				<li>Run <code>cd packages/app-mobile && yarn watchInjectedJs</code></li>
+				<li>Copy <code>packages/app-mobile/components/NoteEditor/CodeMirror/demo.html</code>
+					and <code>packages/app-mobile/components/NoteEditor/CodeMirror/CodeMirror.bundle.js</code>.</li>
+			</ol>
+		</details>
+	</body>
+</html>
