@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+		<title>Avenir Font Rendering Bug</title>
+		<style>
+			body {
+				font-family: Avenir, serif;
+			}
+
+			main {
+				max-width: 600px;
+				margin-left: auto;
+				margin-right: auto;
+			}
+
+			p {
+				text-indent: 0.1in;
+			}
+		</style>
+	</head>
+	<body>
+		<main>
+			<h1>Rendering Test</h1>
+			<p>
+				On computers with the Avenir font installed and accessible by a web browser, this text should be
+				rendered using the <strong>Avenir font</strong>. This should help determine whether
+				<a href="https://discourse.joplinapp.org/t/text-of-notes-is-garbled-in-macos-intel-client-version-3/38900/18">
+					this issue
+				</a> affects recent versions of Chrome, Firefox, and other browsers.
+			</p>
+			<p>
+				Here are several ASCII characters: (, ), ?, :, ', ", &.
+			</p>
+			<p>
+				If this page is rendered in a <span style="font-family: serif;">serif font</span>,
+				then this page can't access the
+				<span style="font-family: Avenir, sans-serif; border: 1px solid grey; border-radius: 3px;">Avenir font</span>.
+			</p>
+		</main>
+	</body>
+</html>
