@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Pointer event bug demo</title>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<style>
+#input-region {
+	width: 500px;
+	height: 500px;
+	border: 2px solid black;
+	text-align: center;
+	vertical-align: middle;
+	touch-action: none;
+}
+
+#log {
+	padding: 4px;
+	font-family: monospace;
+}
+
+.event-pointerdown > .tag {
+	color: red;
+}
+
+.event-pointermove > .tag {
+	color: blue;
+}
+
+.event-pointerup > .tag {
+	color: #f30;
+}
+</style>
+	</head>
+	<body>
+		<main>
+			<div id="input-region">Input region</div>
+			<pre id="log">Log:</pre>
+		</main>
+	</body>
+	<script>
+		(() => {
+			const inputArea = document.querySelector('#input-region');
+			const logOutput = document.querySelector('#log');
+
+			const logEvent = (eventType, event) => {
+				const item = document.createElement('div');
+				item.classList.add(`event-${eventType}`);
+
+				const tag = document.createElement('span');
+				tag.classList.add('tag');
+				tag.append(eventType);
+
+				item.append('[', tag, `]: pointerType=${event.pointerType}, id=${event.pointerId}`);
+				logOutput.append(item);
+			};
+
+			const trackEvent = (eventType) => {
+				inputArea.addEventListener(eventType, (event) => {
+					event.preventDefault();
+					logEvent(eventType, event);
+				});
+			};
+
+			for (const suffix of ['down', 'move', 'up', 'out', 'cancel']) {
+				trackEvent(`pointer${suffix}`);
+			}
+		})();
+	</script>
+</html>
